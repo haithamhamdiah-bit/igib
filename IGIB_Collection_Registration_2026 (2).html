@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGIB Collection Registration 2026</title>
+    
+    <style>
+        /* CSS Variables for Easy Theming */
+        :root {
+            --primary-color: #003781;
+            --primary-light: #0369a1;
+            --primary-dark: #002147;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+        
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            background: white;
+            color: var(--primary-color);
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-title h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .header-title p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .btn-primary {
+            background: var(--primary-light);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(3, 105, 161, 0.3);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn-lang {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-lang:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        
+        /* Main Content */
+        main {
+            padding: 30px 0;
+            min-height: calc(100vh - 95px);
+        }
+        
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-card.green {
+            border-left-color: var(--success-color);
+        }
+        
+        .stat-card.amber {
+            border-left-color: var(--warning-color);
+        }
+        
+        .stat-card.red {
+            border-left-color: var(--danger-color);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .required {
+            color: var(--danger-color);
+        }
+        
+        input, select, textarea {
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 13px;
+        }
+        
+        thead {
+            background: var(--bg-light);
+            position: sticky;
+            top: 0;
+        }
+        
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+        
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: var(--bg-light);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-partial {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        /* Action Buttons in Table */
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        
+        /* Search & Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        .alert.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        
+        /* Collapsible Section */
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible-content.active {
+            max-height: 2000px;
+        }
+        
+        /* RTL Support */
+        [dir="rtl"] {
+            direction: rtl;
+        }
+        
+        [dir="rtl"] th,
+        [dir="rtl"] td {
+            text-align: right;
+        }
+        
+        [dir="rtl"] .card {
+            text-align: right;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            table {
+                font-size: 11px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .header-actions,
+            .filter-bar,
+            .action-btn,
+            .btn {
+                display: none !important;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-light);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo-section">
+                <div class="logo">📊</div>
+                <div class="header-title">
+                    <h1 id="headerTitle">Collection Registration System</h1>
+                    <p id="headerSubtitle">IGIB - 2026 Edition</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button onclick="toggleLanguage()" class="btn btn-lang">
+                    <span>🌐</span>
+                    <span id="langBtn">العربية</span>
+                </button>
+                <span id="currentDate" style="color: rgba(255,255,255,0.9); font-size: 13px;"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        
+        <!-- Alert Message -->
+        <div id="alertMessage" class="alert"></div>
+
+        <!-- Dashboard Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label" id="statTotalLabel">Total Invoices</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-label" id="statCollectedLabel">Total Collected</div>
+                <div class="stat-value" id="statCollected">0 EGP</div>
+            </div>
+            <div class="stat-card amber">
+                <div class="stat-label" id="statPendingLabel">Total Pending</div>
+                <div class="stat-value" id="statPending">0 EGP</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-label" id="statCommissionLabel">Total Commission</div>
+                <div class="stat-value" id="statCommission">0 EGP</div>
+            </div>
+        </div>
+
+        <!-- Add New Entry Form -->
+        <div class="card">
+            <div class="card-header collapsible" onclick="toggleForm()">
+                <h2 class="card-title" id="formTitle">➕ Add New Collection Entry</h2>
+                <button class="btn btn-secondary btn-sm" id="toggleFormBtn">Show/Hide</button>
+            </div>
+            
+            <div id="entryForm" class="collapsible-content">
+                <form onsubmit="addEntry(event)">
+                    <!-- Invoice Information -->
+                    <h3 style="margin-bottom: 15px; color: var(--primary-color); font-size: 16px;" id="invoiceInfoLabel">📄 Invoice Information</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label id="policyLabel">Policy No <span class="required">*</span></label>
+                            <input type="text" id="policyNo" required placeholder="P/401/25/01/028855">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="clientLabel">Client Name <span class="required">*</span></label>
+                            <input type="text" id="clientName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="companyLabel">Insurance Company <span class="required">*</span></label>
+                            <select id="insuranceCompany" required onchange="toggleCustomCompany()">
+                                <option value="">Select...</option>
+                                <option value="Misr Insurance">Misr Insurance</option>
+                                <option value="Allianz">Allianz</option>
+                                <option value="AXA">AXA</option>
+                                <option value="GIG">GIG</option>
+                                <option value="Solidarity">Solidarity</option>
+                                <option value="Mohandes Insurance">Mohandes Insurance</option>
+                                <option value="Delta Insurance">Delta Insurance</option>
+                                <option value="Royal Insurance">Royal Insurance</option>
+                                <option value="Orient Insurance">Orient Insurance</option>
+                                <option value="Wethaq Takaful">Wethaq Takaful</option>
+                                <option value="Egyptian Takaful">Egyptian Takaful</option>
+                                <option value="Misr Takaful">Misr Takaful</option>
+                                <option value="__custom__">➕ Add New Company...</option>
+                            </select>
+                            <input type="text" id="customCompany" placeholder="Enter new company name..." style="display: none; margin-top: 8px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="lobLabel">LOB <span class="required">*</span></label>
+                            <select id="lob" required>
+                                <option value="">Select...</option>
+                                <option value="Motor">Motor</option>
+                                <option value="Property">Property</option>
+                                <option value="Marine">Marine</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Liability">Liability</option>
+                                <option value="Medical">Medical</option>
+                                <option value="Life">Life</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="currencyLabel">Currency</label>
+                            <select id="currency">
+                                <option value="EGP">EGP</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Dates -->
+                    <h3 style="margin: 20px 0 15px; color: var(--primary-color); font-size: 16px;" id="datesLabel">📅 Dates</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label id="issuedDateLabel">Issued Date</label>
+                            <input type="date" id="issuedDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="startDateLabel">Start Date</label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="endDateLabel">End Date</label>
+                            <input type="date" id="endDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="dueDateLabel">Due Date</label>
+                            <input type="date" id="dueDate">
+                        </div>
+                    </div>
+
+                    <!-- Voucher Information -->
+                    <h3 style="margin: 20px 0 15px; color: var(--primary-color); font-size: 16px;" id="voucherLabel">🧾 Voucher Information</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label id="voucherNoLabel">Voucher No</label>
+                            <input type="text" id="voucherNo" placeholder="CV/01/Y25/2/000546">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="voucherDateLabel">Voucher Date</label>
+                            <input type="date" id="voucherDate">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="invoiceNoLabel">Invoice No</label>
+                            <input type="text" id="invoiceNo" placeholder="6/2025">
+                        </div>
+                    </div>
+
+                    <!-- Financial Information -->
+                    <h3 style="margin: 20px 0 15px; color: var(--primary-color); font-size: 16px;" id="financialLabel">💰 Financial Information</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label id="netPremiumLabel">Net Premium (EGP) <span class="required">*</span></label>
+                            <input type="number" id="netPremium" step="0.01" required onchange="calculateCommission()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="commRateLabel">Commission Rate (%)</label>
+                            <input type="number" id="commissionRate" step="0.01" value="21" onchange="calculateCommission()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="grossCommLabel">Gross Commission</label>
+                            <input type="number" id="grossCommission" step="0.01" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="tax5Label">Tax 5%</label>
+                            <input type="number" id="tax5" step="0.01" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="netCommLabel">Net Commission</label>
+                            <input type="number" id="netCommission" step="0.01" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="collectedCommLabel">Collected Commission (EGP)</label>
+                            <input type="number" id="collectedCommission" step="0.01" onchange="calculatePending()">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="pendingCommLabel">Pending Commission (EGP)</label>
+                            <input type="number" id="pendingCommission" step="0.01" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div style="margin-top: 20px; display: flex; gap: 12px;">
+                        <button type="submit" class="btn btn-success">
+                            <span>💾</span>
+                            <span id="saveBtn">Save Entry</span>
+                        </button>
+                        <button type="button" onclick="resetForm()" class="btn btn-secondary">
+                            <span>🔄</span>
+                            <span id="resetBtn">Reset Form</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Collection Records Table -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title" id="recordsTitle">📋 Collection Records</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="exportToExcel()" class="btn btn-success btn-sm">
+                        <span>📥</span>
+                        <span id="exportBtn">Export Excel</span>
+                    </button>
+                    <button onclick="clearAllData()" class="btn btn-danger btn-sm">
+                        <span>🗑️</span>
+                        <span id="clearBtn">Clear All</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search..." onkeyup="filterRecords()">
+                <select id="filterCompany" onchange="filterRecords()">
+                    <option value="">All Companies</option>
+                </select>
+                <select id="filterLOB" onchange="filterRecords()">
+                    <option value="">All LOBs</option>
+                    <option value="Motor">Motor</option>
+                    <option value="Property">Property</option>
+                    <option value="Marine">Marine</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Liability">Liability</option>
+                    <option value="Medical">Medical</option>
+                    <option value="Life">Life</option>
+                    <option value="Other">Other</option>
+                </select>
+                <select id="filterStatus" onchange="filterRecords()">
+                    <option value="">All Status</option>
+                    <option value="paid">Paid</option>
+                    <option value="pending">Pending</option>
+                    <option value="partial">Partial</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Policy No</th>
+                            <th>Client Name</th>
+                            <th>Insurance Company</th>
+                            <th>LOB</th>
+                            <th>Currency</th>
+                            <th>Issued Date</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Net Premium</th>
+                            <th>Commission %</th>
+                            <th>Net Commission</th>
+                            <th>Collected</th>
+                            <th>Pending</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable">
+                        <tr>
+                            <td colspan="15" style="text-align: center; padding: 40px; color: var(--text-light);">
+                                <div style="font-size: 48px; margin-bottom: 10px;">📊</div>
+                                <div id="noDataMsg">No records yet. Add your first collection entry above!</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // ===================================
+        // TRANSLATION SYSTEM
+        // ===================================
+        
+        const translations = {
+            en: {
+                headerTitle: "Collection Registration System",
+                headerSubtitle: "IGIB - 2026 Edition",
+                langBtn: "العربية",
+                statTotalLabel: "Total Invoices",
+                statCollectedLabel: "Total Collected",
+                statPendingLabel: "Total Pending",
+                statCommissionLabel: "Total Commission",
+                formTitle: "➕ Add New Collection Entry",
+                toggleFormBtn: "Show/Hide",
+                invoiceInfoLabel: "📄 Invoice Information",
+                policyLabel: "Policy No",
+                clientLabel: "Client Name",
+                companyLabel: "Insurance Company",
+                lobLabel: "LOB",
+                currencyLabel: "Currency",
+                datesLabel: "📅 Dates",
+                issuedDateLabel: "Issued Date",
+                startDateLabel: "Start Date",
+                endDateLabel: "End Date",
+                dueDateLabel: "Due Date",
+                voucherLabel: "🧾 Voucher Information",
+                voucherNoLabel: "Voucher No",
+                voucherDateLabel: "Voucher Date",
+                invoiceNoLabel: "Invoice No",
+                financialLabel: "💰 Financial Information",
+                netPremiumLabel: "Net Premium (EGP)",
+                commRateLabel: "Commission Rate (%)",
+                grossCommLabel: "Gross Commission",
+                tax5Label: "Tax 5%",
+                netCommLabel: "Net Commission",
+                collectedCommLabel: "Collected Commission (EGP)",
+                pendingCommLabel: "Pending Commission (EGP)",
+                saveBtn: "Save Entry",
+                resetBtn: "Reset Form",
+                recordsTitle: "📋 Collection Records",
+                exportBtn: "Export Excel",
+                clearBtn: "Clear All",
+                noDataMsg: "No records yet. Add your first collection entry above!",
+                saveSuccess: "✓ Entry saved successfully!",
+                saveError: "✗ Error saving entry.",
+                deleteConfirm: "Are you sure you want to delete this entry?",
+                deleteSuccess: "✓ Entry deleted successfully!",
+                clearConfirm: "Are you sure you want to clear all data? This cannot be undone!",
+                clearSuccess: "✓ All data cleared successfully!",
+            },
+            ar: {
+                headerTitle: "نظام تسجيل التحصيلات",
+                headerSubtitle: "IGIB - إصدار 2026",
+                langBtn: "English",
+                statTotalLabel: "إجمالي الفواتير",
+                statCollectedLabel: "إجمالي المحصل",
+                statPendingLabel: "إجمالي المعلق",
+                statCommissionLabel: "إجمالي العمولة",
+                formTitle: "➕ إضافة قيد تحصيل جديد",
+                toggleFormBtn: "إظهار/إخفاء",
+                invoiceInfoLabel: "📄 معلومات الفاتورة",
+                policyLabel: "رقم الوثيقة",
+                clientLabel: "اسم العميل",
+                companyLabel: "شركة التأمين",
+                lobLabel: "نوع التأمين",
+                currencyLabel: "العملة",
+                datesLabel: "📅 التواريخ",
+                issuedDateLabel: "تاريخ الإصدار",
+                startDateLabel: "تاريخ البداية",
+                endDateLabel: "تاريخ النهاية",
+                dueDateLabel: "تاريخ الاستحقاق",
+                voucherLabel: "🧾 معلومات القسيمة",
+                voucherNoLabel: "رقم القسيمة",
+                voucherDateLabel: "تاريخ القسيمة",
+                invoiceNoLabel: "رقم الفاتورة",
+                financialLabel: "💰 المعلومات المالية",
+                netPremiumLabel: "صافي القسط (جنيه)",
+                commRateLabel: "نسبة العمولة (%)",
+                grossCommLabel: "إجمالي العمولة",
+                tax5Label: "ضريبة 5%",
+                netCommLabel: "صافي العمولة",
+                collectedCommLabel: "العمولة المحصلة (جنيه)",
+                pendingCommLabel: "العمولة المعلقة (جنيه)",
+                saveBtn: "حفظ القيد",
+                resetBtn: "إعادة تعيين",
+                recordsTitle: "📋 سجلات التحصيل",
+                exportBtn: "تصدير Excel",
+                clearBtn: "مسح الكل",
+                noDataMsg: "لا توجد سجلات بعد. أضف قيد التحصيل الأول أعلاه!",
+                saveSuccess: "✓ تم حفظ القيد بنجاح!",
+                saveError: "✗ خطأ في حفظ القيد.",
+                deleteConfirm: "هل أنت متأكد من حذف هذا القيد؟",
+                deleteSuccess: "✓ تم حذف القيد بنجاح!",
+                clearConfirm: "هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع عن هذا!",
+                clearSuccess: "✓ تم مسح جميع البيانات بنجاح!",
+            }
+        };
+
+        // ===================================
+        // DATA STORAGE
+        // ===================================
+        
+        let currentLang = localStorage.getItem('collectionLang') || 'en';
+        let collectionData = JSON.parse(localStorage.getItem('collectionData') || '[]');
+        let editingIndex = -1;
+
+        // ===================================
+        // INITIALIZATION
+        // ===================================
+        
+        window.onload = function() {
+            loadCustomCompanies();
+            applyLanguage();
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            renderRecords();
+            updateStatistics();
+            
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('issuedDate').value = today;
+        };
+
+        // ===================================
+        // LANGUAGE FUNCTIONS
+        // ===================================
+        
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            localStorage.setItem('collectionLang', currentLang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const lang = translations[currentLang];
+            const isRTL = currentLang === 'ar';
+            
+            document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLang;
+            
+            for (const [key, value] of Object.entries(lang)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.tagName === 'INPUT' && element.type !== 'date' && element.type !== 'number') {
+                        element.placeholder = value;
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            }
+        }
+
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        // ===================================
+        // DATE & TIME
+        // ===================================
+        
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short',
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            const dateStr = now.toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US', options);
+            document.getElementById('currentDate').textContent = dateStr;
+        }
+
+        // ===================================
+        // FORM FUNCTIONS
+        // ===================================
+        
+        function toggleForm() {
+            const form = document.getElementById('entryForm');
+            form.classList.toggle('active');
+        }
+
+        function toggleCustomCompany() {
+            const select = document.getElementById('insuranceCompany');
+            const customInput = document.getElementById('customCompany');
+            
+            if (select.value === '__custom__') {
+                customInput.style.display = 'block';
+                customInput.required = true;
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+                customInput.required = false;
+                customInput.value = '';
+            }
+        }
+
+        function getCompanyValue() {
+            const select = document.getElementById('insuranceCompany');
+            const customInput = document.getElementById('customCompany');
+            
+            if (select.value === '__custom__') {
+                return customInput.value.trim();
+            }
+            return select.value;
+        }
+
+        function addCompanyToDropdown(companyName) {
+            const select = document.getElementById('insuranceCompany');
+            const filterSelect = document.getElementById('filterCompany');
+            
+            // Check if company already exists
+            const existingOption = Array.from(select.options).find(
+                opt => opt.value === companyName
+            );
+            
+            if (!existingOption && companyName && companyName !== '__custom__') {
+                // Add to main dropdown (before "Add New Company" option)
+                const newOption = document.createElement('option');
+                newOption.value = companyName;
+                newOption.textContent = companyName;
+                select.insertBefore(newOption, select.lastElementChild);
+                
+                // Add to filter dropdown
+                const filterOption = document.createElement('option');
+                filterOption.value = companyName;
+                filterOption.textContent = companyName;
+                filterSelect.appendChild(filterOption);
+                
+                // Save to localStorage
+                saveCompanyList();
+            }
+        }
+
+        function loadCustomCompanies() {
+            const savedCompanies = JSON.parse(localStorage.getItem('customCompanies') || '[]');
+            savedCompanies.forEach(company => {
+                addCompanyToDropdown(company);
+            });
+        }
+
+        function saveCompanyList() {
+            const select = document.getElementById('insuranceCompany');
+            const companies = Array.from(select.options)
+                .map(opt => opt.value)
+                .filter(val => val && val !== '' && val !== '__custom__');
+            
+            const defaultCompanies = [
+                'Misr Insurance', 'Allianz', 'AXA', 'GIG', 'Solidarity',
+                'Mohandes Insurance', 'Delta Insurance', 'Royal Insurance',
+                'Orient Insurance', 'Wethaq Takaful', 'Egyptian Takaful', 'Misr Takaful'
+            ];
+            
+            const customCompanies = companies.filter(c => !defaultCompanies.includes(c));
+            localStorage.setItem('customCompanies', JSON.stringify(customCompanies));
+        }
+
+        function calculateCommission() {
+            const netPremium = parseFloat(document.getElementById('netPremium').value) || 0;
+            const rate = parseFloat(document.getElementById('commissionRate').value) || 0;
+            
+            const grossComm = (netPremium * rate) / 100;
+            const tax = grossComm * 0.05;
+            const netComm = grossComm - tax;
+            
+            document.getElementById('grossCommission').value = grossComm.toFixed(2);
+            document.getElementById('tax5').value = tax.toFixed(2);
+            document.getElementById('netCommission').value = netComm.toFixed(2);
+            
+            calculatePending();
+        }
+
+        function calculatePending() {
+            const netComm = parseFloat(document.getElementById('netCommission').value) || 0;
+            const collected = parseFloat(document.getElementById('collectedCommission').value) || 0;
+            const pending = netComm - collected;
+            
+            document.getElementById('pendingCommission').value = pending.toFixed(2);
+        }
+
+        function resetForm() {
+            document.querySelector('form').reset();
+            document.getElementById('customCompany').style.display = 'none';
+            document.getElementById('customCompany').required = false;
+            editingIndex = -1;
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('issuedDate').value = today;
+            document.getElementById('currency').value = 'EGP';
+            document.getElementById('commissionRate').value = '21';
+        }
+
+        function addEntry(event) {
+            event.preventDefault();
+            
+            const companyValue = getCompanyValue();
+            
+            // Validate custom company name
+            if (!companyValue) {
+                showAlert('Please enter a company name', 'error');
+                return;
+            }
+            
+            const entry = {
+                id: editingIndex >= 0 ? collectionData[editingIndex].id : Date.now(),
+                policyNo: document.getElementById('policyNo').value,
+                clientName: document.getElementById('clientName').value,
+                insuranceCompany: companyValue,
+                lob: document.getElementById('lob').value,
+                currency: document.getElementById('currency').value,
+                issuedDate: document.getElementById('issuedDate').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                voucherNo: document.getElementById('voucherNo').value,
+                voucherDate: document.getElementById('voucherDate').value,
+                dueDate: document.getElementById('dueDate').value,
+                netPremium: parseFloat(document.getElementById('netPremium').value),
+                commissionRate: parseFloat(document.getElementById('commissionRate').value),
+                grossCommission: parseFloat(document.getElementById('grossCommission').value),
+                tax5: parseFloat(document.getElementById('tax5').value),
+                netCommission: parseFloat(document.getElementById('netCommission').value),
+                collectedCommission: parseFloat(document.getElementById('collectedCommission').value) || 0,
+                pendingCommission: parseFloat(document.getElementById('pendingCommission').value) || 0,
+                invoiceNo: document.getElementById('invoiceNo').value
+            };
+            
+            if (editingIndex >= 0) {
+                collectionData[editingIndex] = entry;
+                editingIndex = -1;
+            } else {
+                collectionData.unshift(entry);
+            }
+            
+            // Add new company to dropdown if it's custom
+            addCompanyToDropdown(companyValue);
+            
+            saveData();
+            renderRecords();
+            updateStatistics();
+            resetForm();
+            showAlert(t('saveSuccess'), 'success');
+        }
+
+        // ===================================
+        // DATA MANAGEMENT
+        // ===================================
+        
+        function saveData() {
+            localStorage.setItem('collectionData', JSON.stringify(collectionData));
+        }
+
+        function deleteEntry(id) {
+            if (!confirm(t('deleteConfirm'))) return;
+            
+            collectionData = collectionData.filter(entry => entry.id !== id);
+            saveData();
+            renderRecords();
+            updateStatistics();
+            showAlert(t('deleteSuccess'), 'success');
+        }
+
+        function editEntry(id) {
+            const entry = collectionData.find(e => e.id === id);
+            if (!entry) return;
+            
+            editingIndex = collectionData.findIndex(e => e.id === id);
+            
+            document.getElementById('policyNo').value = entry.policyNo;
+            document.getElementById('clientName').value = entry.clientName;
+            
+            // Check if company exists in dropdown
+            const select = document.getElementById('insuranceCompany');
+            const companyExists = Array.from(select.options).some(opt => opt.value === entry.insuranceCompany);
+            
+            if (companyExists) {
+                select.value = entry.insuranceCompany;
+            } else {
+                // Company doesn't exist, add it first
+                addCompanyToDropdown(entry.insuranceCompany);
+                select.value = entry.insuranceCompany;
+            }
+            
+            document.getElementById('lob').value = entry.lob;
+            document.getElementById('currency').value = entry.currency;
+            document.getElementById('issuedDate').value = entry.issuedDate;
+            document.getElementById('startDate').value = entry.startDate;
+            document.getElementById('endDate').value = entry.endDate;
+            document.getElementById('voucherNo').value = entry.voucherNo || '';
+            document.getElementById('voucherDate').value = entry.voucherDate || '';
+            document.getElementById('dueDate').value = entry.dueDate || '';
+            document.getElementById('netPremium').value = entry.netPremium;
+            document.getElementById('commissionRate').value = entry.commissionRate;
+            document.getElementById('grossCommission').value = entry.grossCommission;
+            document.getElementById('tax5').value = entry.tax5;
+            document.getElementById('netCommission').value = entry.netCommission;
+            document.getElementById('collectedCommission').value = entry.collectedCommission;
+            document.getElementById('pendingCommission').value = entry.pendingCommission;
+            document.getElementById('invoiceNo').value = entry.invoiceNo || '';
+            
+            document.getElementById('entryForm').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearAllData() {
+            if (!confirm(t('clearConfirm'))) return;
+            
+            collectionData = [];
+            saveData();
+            renderRecords();
+            updateStatistics();
+            showAlert(t('clearSuccess'), 'success');
+        }
+
+        // ===================================
+        // RENDER FUNCTIONS
+        // ===================================
+        
+        function updateCompanyFilter() {
+            const filterSelect = document.getElementById('filterCompany');
+            const currentValue = filterSelect.value;
+            
+            // Get unique companies from records
+            const companies = new Set();
+            collectionData.forEach(entry => {
+                if (entry.insuranceCompany) {
+                    companies.add(entry.insuranceCompany);
+                }
+            });
+            
+            // Clear and rebuild options
+            filterSelect.innerHTML = '<option value="">All Companies</option>';
+            
+            Array.from(companies).sort().forEach(company => {
+                const option = document.createElement('option');
+                option.value = company;
+                option.textContent = company;
+                filterSelect.appendChild(option);
+            });
+            
+            // Restore previous selection if it still exists
+            if (currentValue && Array.from(companies).includes(currentValue)) {
+                filterSelect.value = currentValue;
+            }
+        }
+
+        function renderRecords() {
+            const tbody = document.getElementById('recordsTable');
+            
+            if (collectionData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="15" style="text-align: center; padding: 40px; color: var(--text-light);">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📊</div>
+                            <div>${t('noDataMsg')}</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            
+            collectionData.forEach(entry => {
+                const status = getStatus(entry);
+                const statusClass = status === 'Paid' ? 'status-paid' : status === 'Pending' ? 'status-pending' : 'status-partial';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${entry.policyNo}</td>
+                    <td>${entry.clientName}</td>
+                    <td><span style="background: #f3e8ff; color: #6b21a8; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">${entry.insuranceCompany}</span></td>
+                    <td><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">${entry.lob}</span></td>
+                    <td>${entry.currency}</td>
+                    <td>${formatDate(entry.issuedDate)}</td>
+                    <td>${formatDate(entry.startDate)}</td>
+                    <td>${formatDate(entry.endDate)}</td>
+                    <td style="font-weight: 600;">${formatNumber(entry.netPremium)}</td>
+                    <td>${entry.commissionRate}%</td>
+                    <td style="font-weight: 600; color: var(--success-color);">${formatNumber(entry.netCommission)}</td>
+                    <td style="color: var(--success-color);">${formatNumber(entry.collectedCommission)}</td>
+                    <td style="color: var(--warning-color);">${formatNumber(entry.pendingCommission)}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td>
+                        <button onclick="editEntry(${entry.id})" class="btn btn-primary action-btn" title="Edit">✏️</button>
+                        <button onclick="deleteEntry(${entry.id})" class="btn btn-danger action-btn" title="Delete">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            updateCompanyFilter();
+        }
+
+        function updateStatistics() {
+            const total = collectionData.length;
+            const totalCollected = collectionData.reduce((sum, e) => sum + e.collectedCommission, 0);
+            const totalPending = collectionData.reduce((sum, e) => sum + e.pendingCommission, 0);
+            const totalCommission = collectionData.reduce((sum, e) => sum + e.netCommission, 0);
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statCollected').textContent = formatNumber(totalCollected) + ' EGP';
+            document.getElementById('statPending').textContent = formatNumber(totalPending) + ' EGP';
+            document.getElementById('statCommission').textContent = formatNumber(totalCommission) + ' EGP';
+        }
+
+        function filterRecords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const companyFilter = document.getElementById('filterCompany').value;
+            const lobFilter = document.getElementById('filterLOB').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            
+            const rows = document.querySelectorAll('#recordsTable tr');
+            
+            rows.forEach(row => {
+                if (row.cells.length === 1) return; // Skip "no data" row
+                
+                const text = row.textContent.toLowerCase();
+                const company = row.cells[2].textContent.trim();
+                const lob = row.cells[3].textContent.trim();
+                const status = row.cells[13].textContent.toLowerCase();
+                
+                const matchSearch = text.includes(searchTerm);
+                const matchCompany = !companyFilter || company === companyFilter;
+                const matchLOB = !lobFilter || lob === lobFilter;
+                const matchStatus = !statusFilter || status.includes(statusFilter);
+                
+                row.style.display = matchSearch && matchCompany && matchLOB && matchStatus ? '' : 'none';
+            });
+        }
+
+        // ===================================
+        // UTILITY FUNCTIONS
+        // ===================================
+        
+        function getStatus(entry) {
+            if (entry.pendingCommission === 0) return 'Paid';
+            if (entry.collectedCommission === 0) return 'Pending';
+            return 'Partial';
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num || 0);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alertMessage');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        // ===================================
+        // EXPORT TO EXCEL
+        // ===================================
+        
+        function exportToExcel() {
+            if (collectionData.length === 0) {
+                showAlert('No data to export', 'error');
+                return;
+            }
+            
+            let csv = 'Policy No,Client Name,Insurance Company,LOB,Currency,Issued Date,Start Date,End Date,Voucher,Voucher Date,Due Date,Net Premium,Commission Rate,Gross Commission,Tax 5%,Net Commission,Collected Commission,Pending Commission,Invoice No\n';
+            
+            collectionData.forEach(entry => {
+                csv += `"${entry.policyNo}","${entry.clientName}","${entry.insuranceCompany}","${entry.lob}","${entry.currency}",`;
+                csv += `"${entry.issuedDate}","${entry.startDate}","${entry.endDate}",`;
+                csv += `"${entry.voucherNo || ''}","${entry.voucherDate || ''}","${entry.dueDate || ''}",`;
+                csv += `${entry.netPremium},${entry.commissionRate},${entry.grossCommission},`;
+                csv += `${entry.tax5},${entry.netCommission},${entry.collectedCommission},`;
+                csv += `${entry.pendingCommission},"${entry.invoiceNo || ''}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const timestamp = new Date().toISOString().split('T')[0];
+            link.setAttribute('href', url);
+            link.setAttribute('download', `IGIB_Collection_Register_${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('✓ Exported successfully!', 'success');
+        }
+    </script>
+
+</body>
+</html>

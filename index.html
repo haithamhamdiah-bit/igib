@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGIB | Integrated Management Portal 2026</title>
+    
+    <!-- External Dependencies -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'Cairo', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#003781', // IGIB Signature Blue
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .view-container {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .active-view {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        iframe {
+            width: 100%;
+            height: 85vh;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            background: white;
+        }
+        .kpi-card {
+            transition: all 0.2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        .logo-container {
+            transition: opacity 0.2s;
+        }
+        .logo-container:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <!-- Top Navigation Bar (Global Header) -->
+    <nav class="bg-brand-900 text-white px-6 py-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
+        <div class="flex items-center gap-4 cursor-pointer logo-container" onclick="switchView('dashboard')">
+            <!-- Global Logo -->
+            <div class="bg-white p-1 rounded-lg shadow-inner flex items-center justify-center overflow-hidden h-12 w-12">
+                <img src="https://placehold.co/100x100/white/003781?text=IGIB" alt="IGIB Logo" class="h-full w-full object-contain" onerror="this.src='https://via.placeholder.com/48?text=IGIB'">
+            </div>
+            <div>
+                <h1 class="font-bold text-xl tracking-tight leading-none">IGIB PORTAL</h1>
+                <p class="text-[10px] uppercase tracking-widest opacity-70">Integrated System 2026</p>
+            </div>
+        </div>
+
+        <div class="hidden lg:flex items-center gap-6 text-sm font-medium">
+            <button onclick="switchView('dashboard')" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">Dashboard</button>
+            <button onclick="switchView('sales')" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">Sales</button>
+            <button onclick="switchView('claims')" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">Claims</button>
+            <button onclick="switchView('collections')" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">Collections</button>
+            <button onclick="switchView('hr')" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">HR</button>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+                <p id="userNameDisplay" class="font-bold leading-none">Management Account</p>
+                <p id="liveTime" class="text-xs opacity-60">00:00:00</p>
+            </div>
+            <button onclick="logout()" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-[1600px] mx-auto p-4 md:p-6">
+
+        <!-- Dashboard / Overview -->
+        <div id="view-dashboard" class="view-container active-view">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <!-- KPI Cards -->
+                <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border-l-4 border-brand-500">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Total Premium Production</p>
+                    <h3 class="text-2xl font-bold text-slate-800" id="stat-production">0.00</h3>
+                    <p class="text-[10px] text-green-600 mt-2 font-medium uppercase"><i class="fa-solid fa-chart-bar mr-1"></i> Live Sales Data</p>
+                </div>
+                <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border-l-4 border-orange-500">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Pending Claims</p>
+                    <h3 class="text-2xl font-bold text-slate-800" id="stat-claims">0</h3>
+                    <p class="text-[10px] text-slate-400 mt-2 font-medium uppercase">Active Registrations</p>
+                </div>
+                <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Collected Revenue</p>
+                    <h3 class="text-2xl font-bold text-slate-800" id="stat-collections">0.00</h3>
+                    <p class="text-[10px] text-emerald-600 mt-2 font-medium uppercase">Total Commissions</p>
+                </div>
+                <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border-l-4 border-purple-500">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">HR Staff Records</p>
+                    <h3 class="text-2xl font-bold text-slate-800" id="stat-hr">0</h3>
+                    <p class="text-[10px] text-slate-400 mt-2 font-medium uppercase">Unique Log Entries</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center text-brand-900 text-2xl font-bold overflow-hidden">
+                            <!-- Dashboard Local Logo -->
+                            <img src="https://placehold.co/100x100/f0f9ff/003781?text=IGIB" alt="IGIB Logo" class="w-full h-full object-contain">
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-brand-900 mb-1">Welcome Back, <span class="user-name">User</span></h2>
+                            <p class="text-slate-400 text-sm">IGIB Performance Monitoring Center - Fiscal Year 2026</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button onclick="switchView('sales')" class="p-5 rounded-xl border border-slate-100 hover:border-brand-500 hover:bg-brand-50 transition-all text-left group">
+                            <i class="fa-solid fa-file-invoice-dollar text-2xl text-brand-600 mb-3"></i>
+                            <h4 class="font-bold text-slate-800">Sales & Registration</h4>
+                            <p class="text-xs text-slate-500 mt-1">Manage production and policy issuance.</p>
+                        </button>
+                        <button onclick="switchView('claims')" class="p-5 rounded-xl border border-slate-100 hover:border-brand-500 hover:bg-brand-50 transition-all text-left group">
+                            <i class="fa-solid fa-hand-holding-medical text-2xl text-orange-600 mb-3"></i>
+                            <h4 class="font-bold text-slate-800">Claims Tracking</h4>
+                            <p class="text-xs text-slate-500 mt-1">Monitor claim statuses and paid amounts.</p>
+                        </button>
+                        <button onclick="switchView('collections')" class="p-5 rounded-xl border border-slate-100 hover:border-brand-500 hover:bg-brand-50 transition-all text-left group">
+                            <i class="fa-solid fa-money-bill-trend-up text-2xl text-emerald-600 mb-3"></i>
+                            <h4 class="font-bold text-slate-800">Collections</h4>
+                            <p class="text-xs text-slate-500 mt-1">Reconcile commissions and invoices.</p>
+                        </button>
+                        <button onclick="switchView('hr')" class="p-5 rounded-xl border border-slate-100 hover:border-brand-500 hover:bg-brand-50 transition-all text-left group">
+                            <i class="fa-solid fa-users-gear text-2xl text-purple-600 mb-3"></i>
+                            <h4 class="font-bold text-slate-800">Admin & HR</h4>
+                            <p class="text-xs text-slate-500 mt-1">Manage attendance and leave records.</p>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-brand-900 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold mb-3"><i class="fa-solid fa-shield-halved mr-2"></i>System Status</h3>
+                        <p class="text-xs text-brand-100 opacity-70 leading-relaxed mb-4">
+                            Your portal is operating in <strong>TRUE OFFLINE</strong> mode. All code and modules are embedded in this single file.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="bg-white/10 p-4 rounded-xl">
+                                <p class="text-[10px] uppercase font-bold text-brand-200 mb-2">Storage Health</p>
+                                <div class="flex items-center justify-between text-xs mb-1">
+                                    <span>Browser Memory</span>
+                                    <span class="text-green-400">Stable</span>
+                                </div>
+                                <div class="w-full bg-white/20 rounded-full h-1">
+                                    <div class="bg-green-400 h-1 rounded-full w-[90%]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button onclick="exportAllData()" class="w-full bg-white text-brand-900 font-bold py-3 rounded-xl hover:bg-brand-50 transition-all text-sm shadow-lg">
+                            <i class="fa-solid fa-download mr-2"></i> Master Data Backup
+                        </button>
+                        <p class="text-[9px] text-center mt-3 opacity-40 uppercase tracking-tighter">IGIB Integrated Systems v2.1</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Module Containers -->
+        <div id="view-sales" class="view-container">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/100x100/white/003781?text=IGIB" alt="Logo" class="h-8 w-8 object-contain">
+                    <h2 class="text-xl font-bold text-slate-800">Sales & Production</h2>
+                </div>
+                <button onclick="switchView('dashboard')" class="bg-white px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-red-500 shadow-sm border transition-all">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to Dashboard
+                </button>
+            </div>
+            <div id="sales-container"></div>
+        </div>
+
+        <div id="view-claims" class="view-container">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/100x100/white/003781?text=IGIB" alt="Logo" class="h-8 w-8 object-contain">
+                    <h2 class="text-xl font-bold text-slate-800">Claims Register</h2>
+                </div>
+                <button onclick="switchView('dashboard')" class="bg-white px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-red-500 shadow-sm border transition-all">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to Dashboard
+                </button>
+            </div>
+            <div id="claims-container"></div>
+        </div>
+
+        <div id="view-collections" class="view-container">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/100x100/white/003781?text=IGIB" alt="Logo" class="h-8 w-8 object-contain">
+                    <h2 class="text-xl font-bold text-slate-800">Collections & Revenue</h2>
+                </div>
+                <button onclick="switchView('dashboard')" class="bg-white px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-red-500 shadow-sm border transition-all">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to Dashboard
+                </button>
+            </div>
+            <div id="collections-container"></div>
+        </div>
+
+        <div id="view-hr" class="view-container">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/100x100/white/003781?text=IGIB" alt="Logo" class="h-8 w-8 object-contain">
+                    <h2 class="text-xl font-bold text-slate-800">Human Resources</h2>
+                </div>
+                <button onclick="switchView('dashboard')" class="bg-white px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-red-500 shadow-sm border transition-all">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back to Dashboard
+                </button>
+            </div>
+            <div id="hr-container"></div>
+        </div>
+
+    </main>
+
+    <!-- Modal for Initial Login -->
+    <div id="regModal" class="fixed inset-0 bg-brand-900/95 z-[100] flex items-center justify-center hidden">
+        <div class="bg-white w-full max-w-sm p-8 rounded-3xl shadow-2xl mx-4 text-center border-t-8 border-brand-600">
+            <div class="w-20 h-20 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-6 overflow-hidden">
+                <!-- Modal Logo -->
+                <img src="https://placehold.co/100x100/white/003781?text=IGIB" alt="IGIB Logo" class="h-full w-full object-contain">
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Identify Yourself</h2>
+            <p class="text-slate-500 text-sm mb-6">Enter your name to access the 2026 performance portal.</p>
+            <input type="text" id="regName" class="w-full border-2 border-slate-100 p-4 rounded-xl focus:border-brand-500 outline-none transition-all mb-4 text-center font-bold text-lg" placeholder="Manager Name">
+            <button onclick="saveProfile()" class="w-full bg-brand-600 text-white font-bold py-4 rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-500/20 transition-all uppercase tracking-widest text-sm">
+                Access Portal
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const files = {
+            sales: 'REgister Bil 2026.html',
+            claims: 'Claims monthly register.html',
+            collections: 'IGIB_Collection_Registration_2026 (2).html',
+            hr: 'HR.html'
+        };
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active-view'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) {
+                target.classList.add('active-view');
+                if (viewId !== 'dashboard') loadModule(viewId);
+            }
+            if (viewId === 'dashboard') updateStats();
+        }
+
+        function loadModule(id) {
+            const container = document.getElementById(id + '-container');
+            if (container.innerHTML === "") {
+                const fileName = files[id];
+                container.innerHTML = `<iframe src="${fileName}" title="${id}" onerror="handleFrameError('${id}')"></iframe>`;
+            }
+        }
+
+        function handleFrameError(id) {
+            document.getElementById(id + '-container').innerHTML = `
+                <div class="bg-red-50 text-red-600 p-12 rounded-3xl border border-red-100 text-center max-w-2xl mx-auto shadow-sm">
+                    <i class="fa-solid fa-file-circle-exclamation text-5xl mb-6 opacity-50"></i>
+                    <h3 class="font-bold text-xl mb-2">Module File Not Found</h3>
+                    <p class="text-sm mb-6">The file '<strong>${files[id]}</strong>' was not found in the current folder.</p>
+                    <div class="bg-white p-4 rounded-xl text-left text-xs font-mono text-slate-500 border">
+                        1. Download the portal file.<br>
+                        2. Ensure '${files[id]}' is in the same folder.<br>
+                        3. Refresh this page.
+                    </div>
+                </div>`;
+        }
+
+        function updateStats() {
+            try {
+                const salesData = JSON.parse(localStorage.getItem('igib_sales_data_2026') || '[]');
+                const totalProd = salesData.reduce((acc, curr) => acc + (parseFloat(curr.totalPremium) || 0), 0);
+                document.getElementById('stat-production').innerText = totalProd.toLocaleString(undefined, {minimumFractionDigits: 2}) + " EGP";
+
+                const claimsData = JSON.parse(localStorage.getItem('igib_claims_v1') || '[]');
+                document.getElementById('stat-claims').innerText = claimsData.length;
+
+                const collectionData = JSON.parse(localStorage.getItem('igib_collection_2026') || '[]');
+                const totalColl = collectionData.reduce((acc, curr) => acc + (parseFloat(curr.collectedCommission) || 0), 0);
+                document.getElementById('stat-collections').innerText = totalColl.toLocaleString(undefined, {minimumFractionDigits: 2}) + " EGP";
+
+                const hrData = JSON.parse(localStorage.getItem('igib_hr_logs') || '[]');
+                const uniqueStaff = new Set(hrData.map(l => l.name)).size;
+                document.getElementById('stat-hr').innerText = uniqueStaff;
+
+            } catch (e) {
+                console.error("Dashboard Statistics Error:", e);
+            }
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('regName').value;
+            if(!name) return;
+            localStorage.setItem('igib_user_profile', JSON.stringify({ name, login: new Date() }));
+            location.reload();
+        }
+
+        function logout() {
+            if (confirm("Sign out and reset profile?")) {
+                localStorage.removeItem('igib_user_profile');
+                location.reload();
+            }
+        }
+
+        function exportAllData() {
+            const fullData = {
+                metadata: { exportedAt: new Date(), system: "IGIB Integrated Portal 2026" },
+                data: {
+                    sales: JSON.parse(localStorage.getItem('igib_sales_data_2026') || '[]'),
+                    claims: JSON.parse(localStorage.getItem('igib_claims_v1') || '[]'),
+                    collections: JSON.parse(localStorage.getItem('igib_collection_2026') || '[]'),
+                    hr: JSON.parse(localStorage.getItem('igib_hr_logs') || '[]')
+                }
+            };
+            const blob = new Blob([JSON.stringify(fullData, null, 2)], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `IGIB_Complete_System_Backup_2026.json`;
+            a.click();
+        }
+
+        window.onload = () => {
+            const profile = localStorage.getItem('igib_user_profile');
+            if(!profile) {
+                document.getElementById('regModal').classList.remove('hidden');
+            } else {
+                const user = JSON.parse(profile);
+                document.querySelectorAll('.user-name').forEach(el => el.innerText = user.name);
+                document.getElementById('userNameDisplay').innerText = user.name;
+            }
+
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('liveTime').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            }, 1000);
+
+            updateStats();
+        };
+    </script>
+</body>
+</html>

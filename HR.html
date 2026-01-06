@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGIB - بوابة الموارد البشرية</title>
+    <!-- SheetJS Library for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sakkal Majalla', 'Traditional Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #2193b0;
+            font-size: 2em;
+        }
+
+        .header-info {
+            text-align: left;
+            color: #666;
+        }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab.active {
+            background: #2193b0;
+            color: white;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #2193b0;
+            color: white;
+            padding: 15px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-approve {
+            background: #2193b0;
+            color: white;
+        }
+
+        .btn-reject {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #1a7a91;
+        }
+
+        .btn-reject:hover {
+            background: #da190b;
+        }
+
+        /* Status Badges */
+        .status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .header, .tabs, .btn {
+                display: none !important;
+            }
+            
+            #reportOutput {
+                box-shadow: none !important;
+            }
+            
+            .modal {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 id="headerTitle">🏢 IGIB - بوابة الموارد البشرية</h1>
+                <p id="headerSubtitle" style="color: #999; margin-top: 5px;">HR Management Portal</p>
+            </div>
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <button class="btn btn-approve" onclick="toggleLanguage()" id="langBtn">English</button>
+                <div class="header-info">
+                    <p><strong id="dateLabel">التاريخ:</strong> <span id="currentDate"></span></p>
+                    <p><strong id="employeeCountLabel">عدد الموظفين:</strong> <span id="totalEmployees">0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showSection('dashboard')">
+                <span id="tabDashboard">📊 لوحة التحكم</span>
+            </button>
+            <button class="tab" onclick="showSection('employees')">
+                <span id="tabEmployees">👥 الموظفين</span>
+            </button>
+            <button class="tab" onclick="showSection('leaves')">
+                <span id="tabLeaves">📅 الإجازات</span>
+            </button>
+            <button class="tab" onclick="showSection('permissions')">
+                <span id="tabPermissions">🚪 الأذونات</span>
+            </button>
+            <button class="tab" onclick="showSection('training')">
+                <span id="tabTraining">📚 التدريب</span>
+            </button>
+            <button class="tab" onclick="showSection('deductions')">
+                <span id="tabDeductions">💰 الخصومات</span>
+            </button>
+            <button class="tab" onclick="showSection('reports')">
+                <span id="tabReports">📄 التقارير</span>
+            </button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <h2 style="margin-bottom: 20px; color: #333;">📊 نظرة عامة</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="statEmployees">15</h3>
+                    <p>إجمالي الموظفين</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="statPendingLeaves">0</h3>
+                    <p>إجازات معلقة</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="statPendingPermissions">0</h3>
+                    <p>أذونات معلقة</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="statTrainings">0</h3>
+                    <p>دورات تدريبية</p>
+                </div>
+            </div>
+
+            <h3 style="margin: 30px 0 15px; color: #333;">📈 أحدث الأنشطة</h3>
+            <div id="recentActivities">
+                <p style="text-align: center; color: #999; padding: 40px;">لا توجد أنشطة حديثة</p>
+            </div>
+        </div>
+
+        <!-- Employees Section -->
+        <div id="employees" class="content-section">
+            <h2 style="margin-bottom: 20px; color: #333;">👥 إدارة الموظفين</h2>
+            
+            <div class="search-bar">
+                <input type="text" id="employeeSearch" placeholder="🔍 ابحث عن موظف بالاسم أو الكود..." onkeyup="searchEmployees()">
+            </div>
+
+            <div class="table-container">
+                <table id="employeesTable">
+                    <thead>
+                        <tr>
+                            <th>الكود</th>
+                            <th>الاسم</th>
+                            <th>الوظيفة</th>
+                            <th>الإدارة</th>
+                            <th>الحالة</th>
+                            <th>تاريخ التعيين</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Leaves Section -->
+        <div id="leaves" class="content-section">
+            <h2 style="margin-bottom: 20px; color: #333;">📅 إدارة الإجازات</h2>
+            
+            <button class="btn btn-approve" onclick="openLeaveModal()" style="margin-bottom: 20px;">➕ طلب إجازة جديد</button>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الطلب</th>
+                            <th>اسم الموظف</th>
+                            <th>نوع الإجازة</th>
+                            <th>من تاريخ</th>
+                            <th>إلى تاريخ</th>
+                            <th>عدد الأيام</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leavesTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Permissions Section -->
+        <div id="permissions" class="content-section">
+            <h2 style="margin-bottom: 20px; color: #333;">🚪 إدارة الأذونات</h2>
+            
+            <button class="btn btn-approve" onclick="openPermissionModal()" style="margin-bottom: 20px;">➕ طلب إذن جديد</button>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الطلب</th>
+                            <th>اسم الموظف</th>
+                            <th>التاريخ</th>
+                            <th>من الساعة</th>
+                            <th>إلى الساعة</th>
+                            <th>المدة</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="permissionsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Training Section -->
+        <div id="training" class="content-section">
+            <h2 style="margin-bottom: 20px; color: #333;">📚 إدارة التدريب</h2>
+            
+            <button class="btn btn-approve" onclick="openTrainingModal()" style="margin-bottom: 20px;">➕ إضافة دورة تدريبية</button>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الدورة</th>
+                            <th>المدرب</th>
+                            <th>الموظفين</th>
+                            <th>تاريخ البدء</th>
+                            <th>تاريخ الانتهاء</th>
+                            <th>التكلفة</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trainingTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Deductions Section -->
+        <div id="deductions" class="content-section">
+            <h2 style="margin-bottom: 20px; color: #333;">💰 إدارة الخصومات</h2>
+            
+            <button class="btn btn-reject" onclick="openDeductionModal()" style="margin-bottom: 20px;">➕ إضافة خصم</button>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الموظف</th>
+                            <th>نوع الخصم</th>
+                            <th>المبلغ</th>
+                            <th>التاريخ</th>
+                            <th>السبب</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deductionsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports" class="content-section">
+            <h2 style="margin-bottom: 20px; color: #333;">📄 التقارير</h2>
+            
+            <div style="background: #f8f9ff; padding: 25px; border-radius: 12px; margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px; color: #2193b0;">🔍 إنشاء تقرير نشاط</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label id="reportStartDateLabel">من تاريخ:</label>
+                        <input type="date" id="reportStartDate" style="padding: 12px;">
+                    </div>
+                    <div class="form-group">
+                        <label id="reportEndDateLabel">إلى تاريخ:</label>
+                        <input type="date" id="reportEndDate" style="padding: 12px;">
+                    </div>
+                </div>
+                
+                <button class="btn btn-approve" onclick="generateReport()" style="width: 100%; font-size: 18px; padding: 15px;">
+                    <span id="generateReportBtn">📊 إنشاء التقرير</span>
+                </button>
+            </div>
+
+            <div id="reportOutput" style="display: none;">
+                <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #2193b0;">
+                        <div>
+                            <h2 style="color: #2193b0; margin-bottom: 10px;" id="reportTitle">تقرير نشاط الموارد البشرية</h2>
+                            <p style="color: #666;" id="reportPeriod"></p>
+                        </div>
+                        <button class="btn btn-approve" onclick="printReport()">
+                            <span id="printReportBtn">🖨️ طباعة</span>
+                        </button>
+                    </div>
+
+                    <div id="reportContent">
+                        <!-- Report content will be dynamically generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leave Modal -->
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>طلب إجازة جديد</h2>
+                <button class="modal-close" onclick="closeModal('leaveModal')">×</button>
+            </div>
+            <form id="leaveForm">
+                <div class="form-group">
+                    <label>الموظف:</label>
+                    <select id="leaveEmployee" required>
+                        <option value="">اختر موظف</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>نوع الإجازة:</label>
+                    <select id="leaveType" required>
+                        <option value="annual">سنوية</option>
+                        <option value="sick">مرضية</option>
+                        <option value="emergency">طارئة</option>
+                        <option value="unpaid">بدون راتب</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>من تاريخ:</label>
+                    <input type="date" id="leaveStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label>إلى تاريخ:</label>
+                    <input type="date" id="leaveEndDate" required>
+                </div>
+                <div class="form-group">
+                    <label>السبب:</label>
+                    <textarea id="leaveReason" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-approve" style="width: 100%;">إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Permission Modal -->
+    <div id="permissionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>طلب إذن جديد</h2>
+                <button class="modal-close" onclick="closeModal('permissionModal')">×</button>
+            </div>
+            <form id="permissionForm">
+                <div class="form-group">
+                    <label>الموظف:</label>
+                    <select id="permissionEmployee" required>
+                        <option value="">اختر موظف</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>التاريخ:</label>
+                    <input type="date" id="permissionDate" required>
+                </div>
+                <div class="form-group">
+                    <label>من الساعة:</label>
+                    <input type="time" id="permissionStartTime" required>
+                </div>
+                <div class="form-group">
+                    <label>إلى الساعة:</label>
+                    <input type="time" id="permissionEndTime" required>
+                </div>
+                <div class="form-group">
+                    <label>السبب:</label>
+                    <textarea id="permissionReason" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-approve" style="width: 100%;">إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Training Modal -->
+    <div id="trainingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>إضافة دورة تدريبية</h2>
+                <button class="modal-close" onclick="closeModal('trainingModal')">×</button>
+            </div>
+            <form id="trainingForm">
+                <div class="form-group">
+                    <label>اسم الدورة:</label>
+                    <input type="text" id="trainingName" required>
+                </div>
+                <div class="form-group">
+                    <label>المدرب:</label>
+                    <input type="text" id="trainingInstructor" required>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ البدء:</label>
+                    <input type="date" id="trainingStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الانتهاء:</label>
+                    <input type="date" id="trainingEndDate" required>
+                </div>
+                <div class="form-group">
+                    <label>التكلفة (جنيه):</label>
+                    <input type="number" id="trainingCost" required>
+                </div>
+                <button type="submit" class="btn btn-approve" style="width: 100%;">إضافة الدورة</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Deduction Modal -->
+    <div id="deductionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>إضافة خصم</h2>
+                <button class="modal-close" onclick="closeModal('deductionModal')">×</button>
+            </div>
+            <form id="deductionForm">
+                <div class="form-group">
+                    <label>الموظف:</label>
+                    <select id="deductionEmployee" required>
+                        <option value="">اختر موظف</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>نوع الخصم:</label>
+                    <select id="deductionType" required>
+                        <option value="absence">غياب</option>
+                        <option value="late">تأخير</option>
+                        <option value="damage">أضرار</option>
+                        <option value="other">أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المبلغ (جنيه):</label>
+                    <input type="number" id="deductionAmount" required>
+                </div>
+                <div class="form-group">
+                    <label>التاريخ:</label>
+                    <input type="date" id="deductionDate" required>
+                </div>
+                <div class="form-group">
+                    <label>السبب:</label>
+                    <textarea id="deductionReason" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-reject" style="width: 100%;">إضافة الخصم</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Email Configuration
+        const EMAIL_CONFIG = {
+            to: 'ayossif@igib.com.eg',
+            cc: 'wkhairy@igib.com.eg',
+            companyName: 'IGIB'
+        };
+
+        // Language System
+        let currentLang = 'ar'; // Default language is Arabic
+
+        const translations = {
+            ar: {
+                // Header
+                headerTitle: 'IGIB - بوابة الموارد البشرية',
+                headerSubtitle: 'HR Management Portal',
+                dateLabel: 'التاريخ:',
+                employeeCountLabel: 'عدد الموظفين:',
+                langBtn: 'English',
+                
+                // Tabs
+                tabDashboard: '📊 لوحة التحكم',
+                tabEmployees: '👥 الموظفين',
+                tabLeaves: '📅 الإجازات',
+                tabPermissions: '🚪 الأذونات',
+                tabTraining: '📚 التدريب',
+                tabDeductions: '💰 الخصومات',
+                tabReports: '📄 التقارير',
+                
+                // Dashboard
+                dashboardTitle: '📊 نظرة عامة',
+                statEmployeesLabel: 'إجمالي الموظفين',
+                statPendingLeavesLabel: 'إجازات معلقة',
+                statPendingPermissionsLabel: 'أذونات معلقة',
+                statTrainingsLabel: 'دورات تدريبية',
+                recentActivitiesTitle: '📈 أحدث الأنشطة',
+                noActivities: 'لا توجد أنشطة حديثة',
+                
+                // Employees
+                employeesTitle: '👥 إدارة الموظفين',
+                searchPlaceholder: '🔍 ابحث عن موظف بالاسم أو الكود...',
+                tableCode: 'الكود',
+                tableName: 'الاسم',
+                tablePosition: 'الوظيفة',
+                tableDepartment: 'الإدارة',
+                tableStatus: 'الحالة',
+                tableHireDate: 'تاريخ التعيين',
+                
+                // Leaves
+                leavesTitle: '📅 إدارة الإجازات',
+                newLeaveBtn: '➕ طلب إجازة جديد',
+                leaveRequestNo: 'رقم الطلب',
+                leaveEmployeeName: 'اسم الموظف',
+                leaveType: 'نوع الإجازة',
+                leaveFrom: 'من تاريخ',
+                leaveTo: 'إلى تاريخ',
+                leaveDays: 'عدد الأيام',
+                leaveStatus: 'الحالة',
+                leaveActions: 'الإجراءات',
+                noLeaves: 'لا توجد طلبات إجازات',
+                approveBtn: 'موافقة',
+                rejectBtn: 'رفض',
+                statusPending: 'معلقة',
+                statusApproved: 'موافق عليها',
+                statusRejected: 'مرفوضة',
+                
+                // Permissions
+                permissionsTitle: '🚪 إدارة الأذونات',
+                newPermissionBtn: '➕ طلب إذن جديد',
+                permissionDate: 'التاريخ',
+                permissionFromTime: 'من الساعة',
+                permissionToTime: 'إلى الساعة',
+                permissionDuration: 'المدة',
+                noPermissions: 'لا توجد طلبات أذونات',
+                
+                // Training
+                trainingTitle: '📚 إدارة التدريب',
+                newTrainingBtn: '➕ إضافة دورة تدريبية',
+                trainingName: 'اسم الدورة',
+                trainingInstructor: 'المدرب',
+                trainingEmployees: 'الموظفين',
+                trainingStartDate: 'تاريخ البدء',
+                trainingEndDate: 'تاريخ الانتهاء',
+                trainingCost: 'التكلفة',
+                trainingStatus: 'الحالة',
+                noTraining: 'لا توجد دورات تدريبية',
+                
+                // Deductions
+                deductionsTitle: '💰 إدارة الخصومات',
+                newDeductionBtn: '➕ إضافة خصم',
+                deductionType: 'نوع الخصم',
+                deductionAmount: 'المبلغ',
+                deductionDate: 'التاريخ',
+                deductionReason: 'السبب',
+                noDeductions: 'لا توجد خصومات',
+                deleteBtn: 'حذف',
+                
+                // Modals
+                modalLeaveTitle: 'طلب إجازة جديد',
+                modalPermissionTitle: 'طلب إذن جديد',
+                modalTrainingTitle: 'إضافة دورة تدريبية',
+                modalDeductionTitle: 'إضافة خصم',
+                modalEmployee: 'الموظف:',
+                modalSelectEmployee: 'اختر موظف',
+                modalLeaveTypeLabel: 'نوع الإجازة:',
+                modalLeaveTypeAnnual: 'سنوية',
+                modalLeaveTypeSick: 'مرضية',
+                modalLeaveTypeEmergency: 'طارئة',
+                modalLeaveTypeUnpaid: 'بدون راتب',
+                modalFromDate: 'من تاريخ:',
+                modalToDate: 'إلى تاريخ:',
+                modalReason: 'السبب:',
+                modalSubmit: 'إرسال الطلب',
+                modalDate: 'التاريخ:',
+                modalFromTime: 'من الساعة:',
+                modalToTime: 'إلى الساعة:',
+                modalTrainingNameLabel: 'اسم الدورة:',
+                modalInstructor: 'المدرب:',
+                modalStartDate: 'تاريخ البدء:',
+                modalEndDate: 'تاريخ الانتهاء:',
+                modalCost: 'التكلفة (جنيه):',
+                modalAddTraining: 'إضافة الدورة',
+                modalDeductionTypeLabel: 'نوع الخصم:',
+                modalDeductionAbsence: 'غياب',
+                modalDeductionLate: 'تأخير',
+                modalDeductionDamage: 'أضرار',
+                modalDeductionOther: 'أخرى',
+                modalAmount: 'المبلغ (جنيه):',
+                modalAddDeduction: 'إضافة الخصم',
+                
+                // Alerts
+                alertLeaveSuccess: 'تم إرسال طلب الإجازة بنجاح!',
+                alertPermissionSuccess: 'تم إرسال طلب الإذن بنجاح!',
+                alertTrainingSuccess: 'تم إضافة الدورة التدريبية بنجاح!',
+                alertDeductionSuccess: 'تم إضافة الخصم بنجاح!',
+                alertLeaveApproved: 'تمت الموافقة على طلب الإجازة!',
+                alertLeaveRejected: 'تم رفض طلب الإجازة!',
+                alertPermissionApproved: 'تمت الموافقة على طلب الإذن!',
+                alertPermissionRejected: 'تم رفض طلب الإذن!',
+                alertDeductionDeleted: 'تم حذف الخصم بنجاح!',
+                confirmDelete: 'هل أنت متأكد من حذف هذا الخصم؟',
+                
+                // Misc
+                currency: 'جنيه',
+                minutes: 'دقيقة',
+                active: 'نشطة',
+                
+                // Reports
+                reportsTitle: '📄 التقارير',
+                reportCreateTitle: '🔍 إنشاء تقرير نشاط',
+                reportStartDateLabel: 'من تاريخ:',
+                reportEndDateLabel: 'إلى تاريخ:',
+                generateReportBtn: '📊 إنشاء التقرير',
+                reportTitle: 'تقرير نشاط الموارد البشرية',
+                printReportBtn: '🖨️ طباعة',
+                reportPeriodLabel: 'الفترة:',
+                reportSummaryTitle: '📈 ملخص عام',
+                reportLeavesSection: '📅 الإجازات',
+                reportPermissionsSection: '🚪 الأذونات',
+                reportTrainingSection: '📚 التدريب',
+                reportDeductionsSection: '💰 الخصومات',
+                reportTotalRequests: 'إجمالي الطلبات',
+                reportApproved: 'موافق عليها',
+                reportRejected: 'مرفوضة',
+                reportPending: 'معلقة',
+                reportTotalDays: 'إجمالي الأيام',
+                reportTotalCourses: 'إجمالي الدورات',
+                reportTotalCost: 'إجمالي التكلفة',
+                reportTotalDeductions: 'إجمالي الخصومات',
+                reportTotalAmount: 'إجمالي المبلغ',
+                reportNoData: 'لا توجد بيانات في هذه الفترة',
+                reportDetailsTitle: 'التفاصيل',
+                reportEmployee: 'الموظف',
+                reportType: 'النوع',
+                reportDate: 'التاريخ',
+                reportStatus: 'الحالة',
+                reportDays: 'الأيام',
+                reportDuration: 'المدة',
+                reportInstructor: 'المدرب',
+                reportCost: 'التكلفة',
+                reportAmount: 'المبلغ',
+                reportReason: 'السبب',
+                
+                // Email & Export
+                sendEmailBtn: '📧 إرسال بالبريد الإلكتروني',
+                exportExcelBtn: '📥 تصدير إلى Excel',
+                emailSent: 'تم إرسال الطلب بالبريد الإلكتروني بنجاح!',
+                emailSubjectLeave: 'طلب إجازة جديد - IGIB',
+                emailSubjectPermission: 'طلب إذن جديد - IGIB',
+                emailSubjectTraining: 'دورة تدريبية جديدة - IGIB',
+                emailSubjectDeduction: 'خصم جديد - IGIB',
+                emailBodyIntro: 'تم تقديم طلب جديد في نظام الموارد البشرية:',
+                emailBodyRequestType: 'نوع الطلب:',
+                emailBodyEmployee: 'الموظف:',
+                emailBodyDetails: 'التفاصيل:',
+                emailBodyLeaveType: 'نوع الإجازة:',
+                emailBodyFromDate: 'من تاريخ:',
+                emailBodyToDate: 'إلى تاريخ:',
+                emailBodyDays: 'عدد الأيام:',
+                emailBodyReason: 'السبب:',
+                emailBodyDate: 'التاريخ:',
+                emailBodyFromTime: 'من الساعة:',
+                emailBodyToTime: 'إلى الساعة:',
+                emailBodyDuration: 'المدة:',
+                emailBodyCourseName: 'اسم الدورة:',
+                emailBodyInstructor: 'المدرب:',
+                emailBodyStartDate: 'تاريخ البدء:',
+                emailBodyEndDate: 'تاريخ الانتهاء:',
+                emailBodyCost: 'التكلفة:',
+                emailBodyDeductionType: 'نوع الخصم:',
+                emailBodyAmount: 'المبلغ:',
+                emailBodyAttachment: 'تم إرفاق ملف Excel يحتوي على كامل التفاصيل.',
+                excelFilenameLeave: 'طلب_إجازة',
+                excelFilenamePermission: 'طلب_إذن',
+                excelFilenameTraining: 'دورة_تدريبية',
+                excelFilenameDeduction: 'خصم'
+            },
+            en: {
+                // Header
+                headerTitle: 'IGIB - HR Management Portal',
+                headerSubtitle: 'بوابة الموارد البشرية',
+                dateLabel: 'Date:',
+                employeeCountLabel: 'Total Employees:',
+                langBtn: 'العربية',
+                
+                // Tabs
+                tabDashboard: '📊 Dashboard',
+                tabEmployees: '👥 Employees',
+                tabLeaves: '📅 Leaves',
+                tabPermissions: '🚪 Permissions',
+                tabTraining: '📚 Training',
+                tabDeductions: '💰 Deductions',
+                tabReports: '📄 Reports',
+                
+                // Dashboard
+                dashboardTitle: '📊 Overview',
+                statEmployeesLabel: 'Total Employees',
+                statPendingLeavesLabel: 'Pending Leaves',
+                statPendingPermissionsLabel: 'Pending Permissions',
+                statTrainingsLabel: 'Training Courses',
+                recentActivitiesTitle: '📈 Recent Activities',
+                noActivities: 'No recent activities',
+                
+                // Employees
+                employeesTitle: '👥 Employee Management',
+                searchPlaceholder: '🔍 Search by name or code...',
+                tableCode: 'Code',
+                tableName: 'Name',
+                tablePosition: 'Position',
+                tableDepartment: 'Department',
+                tableStatus: 'Status',
+                tableHireDate: 'Hire Date',
+                
+                // Leaves
+                leavesTitle: '📅 Leave Management',
+                newLeaveBtn: '➕ New Leave Request',
+                leaveRequestNo: 'Request #',
+                leaveEmployeeName: 'Employee Name',
+                leaveType: 'Leave Type',
+                leaveFrom: 'From Date',
+                leaveTo: 'To Date',
+                leaveDays: 'Days',
+                leaveStatus: 'Status',
+                leaveActions: 'Actions',
+                noLeaves: 'No leave requests',
+                approveBtn: 'Approve',
+                rejectBtn: 'Reject',
+                statusPending: 'Pending',
+                statusApproved: 'Approved',
+                statusRejected: 'Rejected',
+                
+                // Permissions
+                permissionsTitle: '🚪 Permission Management',
+                newPermissionBtn: '➕ New Permission Request',
+                permissionDate: 'Date',
+                permissionFromTime: 'From Time',
+                permissionToTime: 'To Time',
+                permissionDuration: 'Duration',
+                noPermissions: 'No permission requests',
+                
+                // Training
+                trainingTitle: '📚 Training Management',
+                newTrainingBtn: '➕ Add Training Course',
+                trainingName: 'Course Name',
+                trainingInstructor: 'Instructor',
+                trainingEmployees: 'Employees',
+                trainingStartDate: 'Start Date',
+                trainingEndDate: 'End Date',
+                trainingCost: 'Cost',
+                trainingStatus: 'Status',
+                noTraining: 'No training courses',
+                
+                // Deductions
+                deductionsTitle: '💰 Deduction Management',
+                newDeductionBtn: '➕ Add Deduction',
+                deductionType: 'Type',
+                deductionAmount: 'Amount',
+                deductionDate: 'Date',
+                deductionReason: 'Reason',
+                noDeductions: 'No deductions',
+                deleteBtn: 'Delete',
+                
+                // Modals
+                modalLeaveTitle: 'New Leave Request',
+                modalPermissionTitle: 'New Permission Request',
+                modalTrainingTitle: 'Add Training Course',
+                modalDeductionTitle: 'Add Deduction',
+                modalEmployee: 'Employee:',
+                modalSelectEmployee: 'Select employee',
+                modalLeaveTypeLabel: 'Leave Type:',
+                modalLeaveTypeAnnual: 'Annual',
+                modalLeaveTypeSick: 'Sick',
+                modalLeaveTypeEmergency: 'Emergency',
+                modalLeaveTypeUnpaid: 'Unpaid',
+                modalFromDate: 'From Date:',
+                modalToDate: 'To Date:',
+                modalReason: 'Reason:',
+                modalSubmit: 'Submit Request',
+                modalDate: 'Date:',
+                modalFromTime: 'From Time:',
+                modalToTime: 'To Time:',
+                modalTrainingNameLabel: 'Course Name:',
+                modalInstructor: 'Instructor:',
+                modalStartDate: 'Start Date:',
+                modalEndDate: 'End Date:',
+                modalCost: 'Cost (EGP):',
+                modalAddTraining: 'Add Course',
+                modalDeductionTypeLabel: 'Deduction Type:',
+                modalDeductionAbsence: 'Absence',
+                modalDeductionLate: 'Late',
+                modalDeductionDamage: 'Damage',
+                modalDeductionOther: 'Other',
+                modalAmount: 'Amount (EGP):',
+                modalAddDeduction: 'Add Deduction',
+                
+                // Alerts
+                alertLeaveSuccess: 'Leave request submitted successfully!',
+                alertPermissionSuccess: 'Permission request submitted successfully!',
+                alertTrainingSuccess: 'Training course added successfully!',
+                alertDeductionSuccess: 'Deduction added successfully!',
+                alertLeaveApproved: 'Leave request approved!',
+                alertLeaveRejected: 'Leave request rejected!',
+                alertPermissionApproved: 'Permission request approved!',
+                alertPermissionRejected: 'Permission request rejected!',
+                alertDeductionDeleted: 'Deduction deleted successfully!',
+                confirmDelete: 'Are you sure you want to delete this deduction?',
+                
+                // Misc
+                currency: 'EGP',
+                minutes: 'minutes',
+                active: 'Active',
+                
+                // Reports
+                reportsTitle: '📄 Reports',
+                reportCreateTitle: '🔍 Generate Activity Report',
+                reportStartDateLabel: 'From Date:',
+                reportEndDateLabel: 'To Date:',
+                generateReportBtn: '📊 Generate Report',
+                reportTitle: 'HR Activity Report',
+                printReportBtn: '🖨️ Print',
+                reportPeriodLabel: 'Period:',
+                reportSummaryTitle: '📈 Summary',
+                reportLeavesSection: '📅 Leaves',
+                reportPermissionsSection: '🚪 Permissions',
+                reportTrainingSection: '📚 Training',
+                reportDeductionsSection: '💰 Deductions',
+                reportTotalRequests: 'Total Requests',
+                reportApproved: 'Approved',
+                reportRejected: 'Rejected',
+                reportPending: 'Pending',
+                reportTotalDays: 'Total Days',
+                reportTotalCourses: 'Total Courses',
+                reportTotalCost: 'Total Cost',
+                reportTotalDeductions: 'Total Deductions',
+                reportTotalAmount: 'Total Amount',
+                reportNoData: 'No data available for this period',
+                reportDetailsTitle: 'Details',
+                reportEmployee: 'Employee',
+                reportType: 'Type',
+                reportDate: 'Date',
+                reportStatus: 'Status',
+                reportDays: 'Days',
+                reportDuration: 'Duration',
+                reportInstructor: 'Instructor',
+                reportCost: 'Cost',
+                reportAmount: 'Amount',
+                reportReason: 'Reason',
+                
+                // Email & Export
+                sendEmailBtn: '📧 Send via Email',
+                exportExcelBtn: '📥 Export to Excel',
+                emailSent: 'Request sent via email successfully!',
+                emailSubjectLeave: 'New Leave Request - IGIB',
+                emailSubjectPermission: 'New Permission Request - IGIB',
+                emailSubjectTraining: 'New Training Course - IGIB',
+                emailSubjectDeduction: 'New Deduction - IGIB',
+                emailBodyIntro: 'A new request has been submitted in the HR system:',
+                emailBodyRequestType: 'Request Type:',
+                emailBodyEmployee: 'Employee:',
+                emailBodyDetails: 'Details:',
+                emailBodyLeaveType: 'Leave Type:',
+                emailBodyFromDate: 'From Date:',
+                emailBodyToDate: 'To Date:',
+                emailBodyDays: 'Days:',
+                emailBodyReason: 'Reason:',
+                emailBodyDate: 'Date:',
+                emailBodyFromTime: 'From Time:',
+                emailBodyToTime: 'To Time:',
+                emailBodyDuration: 'Duration:',
+                emailBodyCourseName: 'Course Name:',
+                emailBodyInstructor: 'Instructor:',
+                emailBodyStartDate: 'Start Date:',
+                emailBodyEndDate: 'End Date:',
+                emailBodyCost: 'Cost:',
+                emailBodyDeductionType: 'Deduction Type:',
+                emailBodyAmount: 'Amount:',
+                emailBodyAttachment: 'An Excel file with complete details is attached.',
+                excelFilenameLeave: 'Leave_Request',
+                excelFilenamePermission: 'Permission_Request',
+                excelFilenameTraining: 'Training_Course',
+                excelFilenameDeduction: 'Deduction'
+            }
+        };
+
+        // Toggle Language Function
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            updateUILanguage();
+            
+            // Reload current section data
+            const activeTab = document.querySelector('.tab.active');
+            if (activeTab) {
+                const sectionId = activeTab.getAttribute('onclick').match(/'(\w+)'/)[1];
+                if (sectionId === 'employees') loadEmployees();
+                if (sectionId === 'leaves') loadLeaves();
+                if (sectionId === 'permissions') loadPermissions();
+                if (sectionId === 'training') loadTrainings();
+                if (sectionId === 'deductions') loadDeductions();
+            }
+        }
+
+        // Update all UI text based on current language
+        function updateUILanguage() {
+            const t = translations[currentLang];
+            
+            // Header
+            document.getElementById('headerTitle').textContent = t.headerTitle;
+            document.getElementById('headerSubtitle').textContent = t.headerSubtitle;
+            document.getElementById('dateLabel').textContent = t.dateLabel;
+            document.getElementById('employeeCountLabel').textContent = t.employeeCountLabel;
+            document.getElementById('langBtn').textContent = t.langBtn;
+            
+            // Tabs
+            document.getElementById('tabDashboard').textContent = t.tabDashboard;
+            document.getElementById('tabEmployees').textContent = t.tabEmployees;
+            document.getElementById('tabLeaves').textContent = t.tabLeaves;
+            document.getElementById('tabPermissions').textContent = t.tabPermissions;
+            document.getElementById('tabTraining').textContent = t.tabTraining;
+            document.getElementById('tabDeductions').textContent = t.tabDeductions;
+            document.getElementById('tabReports').textContent = t.tabReports;
+            
+            // Dashboard
+            document.querySelector('#dashboard h2').textContent = t.dashboardTitle;
+            document.querySelectorAll('#dashboard .stat-card p')[0].textContent = t.statEmployeesLabel;
+            document.querySelectorAll('#dashboard .stat-card p')[1].textContent = t.statPendingLeavesLabel;
+            document.querySelectorAll('#dashboard .stat-card p')[2].textContent = t.statPendingPermissionsLabel;
+            document.querySelectorAll('#dashboard .stat-card p')[3].textContent = t.statTrainingsLabel;
+            document.querySelector('#dashboard h3').textContent = t.recentActivitiesTitle;
+            
+            // Section Titles
+            document.querySelector('#employees h2').textContent = t.employeesTitle;
+            document.querySelector('#leaves h2').textContent = t.leavesTitle;
+            document.querySelector('#permissions h2').textContent = t.permissionsTitle;
+            document.querySelector('#training h2').textContent = t.trainingTitle;
+            document.querySelector('#deductions h2').textContent = t.deductionsTitle;
+            document.querySelector('#reports h2').textContent = t.reportsTitle;
+            
+            // Search Placeholder
+            document.getElementById('employeeSearch').placeholder = t.searchPlaceholder;
+            
+            // Modal Titles
+            document.querySelectorAll('#leaveModal h2')[0].textContent = t.modalLeaveTitle;
+            document.querySelectorAll('#permissionModal h2')[0].textContent = t.modalPermissionTitle;
+            document.querySelectorAll('#trainingModal h2')[0].textContent = t.modalTrainingTitle;
+            document.querySelectorAll('#deductionModal h2')[0].textContent = t.modalDeductionTitle;
+        }
+
+        // Employee Data - Your provided data
+        const employees = [
+            {code: "10102", nameAr: "فرح محمد محمود إبراهيم", nameEn: "Farah Mohamed Mahmoud Ibrahim", gender: "F", nationality: "مصري", religion: "مسلم", nationalId: "30101052103164", firstHire: "28-Nov-24", contractDate: "28-Nov-25", contractEnd: "27-Feb-26", status: "Single", position: "منسق شئون إدارية", positionEn: "Administrative Affairs Coordinator", location: "المقر الرئيسي", department: "الموارد البشرية و الشئون الإدارية", departmentEn: "HR & Administrative Affairs"},
+            {code: "10201", nameAr: "هيثم حمدي أحمد أحمد إبراهيم", nameEn: "Haitham Hamdy Ahmed Ahmed Ibrahim", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "28601010141612", firstHire: "02-Nov-24", contractDate: "02-Nov-25", contractEnd: "1-Feb-26", status: "Divorced", position: "مشرف الحاسب الألي", positionEn: "IT Supervisor", location: "المقر الرئيسي", department: "نظم المعلومات", departmentEn: "Information Systems"},
+            {code: "10103", nameAr: "صلاح أحمد صلاح عبد الكريم", nameEn: "Salah Ahmed Salah Abd Elkarem", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "28205302201095", firstHire: "03-Nov-24", contractDate: "03-Nov-25", contractEnd: "2-Feb-26", status: "Married", position: "عامل بوفيه", positionEn: "Cafeteria Worker", location: "المقر الرئيسي", department: "الموارد البشرية و الشئون الإدارية", departmentEn: "HR & Administrative Affairs"},
+            {code: "30102", nameAr: "أية محمد عبدالمنعم حمدون", nameEn: "Aya Mohamed Abd El Monaem Hamdon", gender: "F", nationality: "مصري", religion: "مسلم", nationalId: "28803270100342", firstHire: "01-Jan-25", contractDate: "01-Jan-26", contractEnd: "31-Mar-26", status: "Married", position: "مشرف مبيعات", positionEn: "Sales Supervisor", location: "المقر الرئيسي", department: "تطوير الأعمال", departmentEn: "Business Development"},
+            {code: "10202", nameAr: "مؤيد شعبان محمد محمد", nameEn: "Moayed Shaban Mohamed Mohamed", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "29707312400613", firstHire: "03-Nov-24", contractDate: "03-Nov-25", contractEnd: "2-Feb-26", status: "Single", position: "مندوب", positionEn: "Representative", location: "المقر الرئيسي", department: "الموارد البشرية و الشئون الإدارية", departmentEn: "HR & Administrative Affairs"},
+            {code: "10104", nameAr: "محمد خميس محمد حميدة", nameEn: "Mohamed Khamis Mohamed Hemida", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "29009072102599", firstHire: "10-Dec-24", contractDate: "10-Dec-25", contractEnd: "9-Mar-26", status: "Married", position: "مندوب", positionEn: "Representative", location: "المقر الرئيسي", department: "الموارد البشرية و الشئون الإدارية", departmentEn: "HR & Administrative Affairs"},
+            {code: "20101", nameAr: "أحمد حسن عزوز عبد المعطي", nameEn: "Ahmed Hassan Azzouz Abd ElMoaty", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "29302010119354", firstHire: "15-Dec-24", contractDate: "15-Dec-25", contractEnd: "14-Mar-26", status: "Single", position: "مدير العمليات", positionEn: "Operations Manager", location: "المقر الرئيسي", department: "العمليات", departmentEn: "Operations"},
+            {code: "20103", nameAr: "محمد محمود عبدالحميد أحمد", nameEn: "Mohamed Mahmoud Abdelhamid Ahmed", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "29701022104974", firstHire: "16-Feb-24", contractDate: "16-Feb-25", contractEnd: "15-May-25", status: "Single", position: "أخصائي أول تعويضات", positionEn: "Senior Compensation Specialist", location: "المقر الرئيسي", department: "العمليات", departmentEn: "Operations"},
+            {code: "10105", nameAr: "محمد فوزي عبدالفتاح محمد بدر", nameEn: "Mohamed Fawzy Abdelfattah Mohamed Badr", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "28807010104633", firstHire: "13-Apr-25", contractDate: "13-Apr-26", contractEnd: "12-Jul-26", status: "Married", position: "سائق", positionEn: "Driver", location: "المقر الرئيسي", department: "الموارد البشرية و الشئون الإدارية", departmentEn: "HR & Administrative Affairs"},
+            {code: "10106", nameAr: "صباح عبد التواب قرني علي", nameEn: "Sabah Abdeltawab Korany Ali", gender: "F", nationality: "مصري", religion: "مسلم", nationalId: "28509072103403", firstHire: "01-Aug-25", contractDate: "01-Aug-26", contractEnd: "31-Oct-26", status: "Married", position: "خدمات معاونة", positionEn: "Support Services", location: "المقر الرئيسي", department: "الموارد البشرية و الشئون الإدارية", departmentEn: "HR & Administrative Affairs"},
+            {code: "10303", nameAr: "عبد الرحمن رضا جميل محمود", nameEn: "Abdelrahman Reda Gamil Mahmoud", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "29701232102851", firstHire: "01-Oct-25", contractDate: "01-Oct-25", contractEnd: "31-Dec-25", status: "Married", position: "محاسب أول", positionEn: "Senior Accountant", location: "المقر الرئيسي", department: "المالية", departmentEn: "Finance"},
+            {code: "20106", nameAr: "اسلام مصطفي عبد الوهاب مصطقي", nameEn: "Islam Mostafa Abdelwahab Mostafa", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "29003091700253", firstHire: "26-Oct-25", contractDate: "26-Oct-25", contractEnd: "25-Jan-26", status: "Married", position: "اخصائي اول", positionEn: "Senior Specialist", location: "المقر الرئيسي", department: "العمليات", departmentEn: "Operations"},
+            {code: "10107", nameAr: "اشرف غبريال شكري يوسف", nameEn: "Ashraf Ghobrial Shokry youssif", gender: "M", nationality: "مصري", religion: "مسيحي", nationalId: "26312140102075", firstHire: "09-Nov-25", contractDate: "09-Nov-25", contractEnd: "8-Feb-26", status: "Married", position: "مدير موارد بشرية وشئون إدارية", positionEn: "HR & Admin Manager", location: "المقر الرئيسي", department: "الموارد البشرية و الشئون الإدارية", departmentEn: "HR & Administrative Affairs"},
+            {code: "30103", nameAr: "مصطفي عوض عرفات خضر", nameEn: "Mostafa Awad Arafat Kheder", gender: "M", nationality: "مصري", religion: "مسلم", nationalId: "27411182102751", firstHire: "01-Dec-25", contractDate: "01-Dec-25", contractEnd: "28-Feb-26", status: "Married", position: "مدير وحدة عمليات", positionEn: "Operations Unit Manager", location: "المقر الرئيسي", department: "العمليات", departmentEn: "Operations"},
+            {code: "30104", nameAr: "داليا سالم محمد سالم", nameEn: "Dalia Salem Mohamed Salem", gender: "F", nationality: "مصري", religion: "مسلم", nationalId: "29605200102205", firstHire: "01-Dec-25", contractDate: "01-Dec-25", contractEnd: "28-Feb-26", status: "Married", position: "اخصائي أول تأمينات عامة", positionEn: "Senior General Insurance Specialist", location: "المقر الرئيسي", department: "تامينات عامة", departmentEn: "General Insurance"}
+        ];
+
+        // Initialize LocalStorage
+        function initializeStorage() {
+            if (!localStorage.getItem('leaves')) {
+                localStorage.setItem('leaves', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('permissions')) {
+                localStorage.setItem('permissions', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('trainings')) {
+                localStorage.setItem('trainings', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('deductions')) {
+                localStorage.setItem('deductions', JSON.stringify([]));
+            }
+        }
+
+        // Tab Switching
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active to clicked tab
+            event.target.classList.add('active');
+            
+            // Refresh data
+            if (sectionId === 'employees') loadEmployees();
+            if (sectionId === 'leaves') loadLeaves();
+            if (sectionId === 'permissions') loadPermissions();
+            if (sectionId === 'training') loadTrainings();
+            if (sectionId === 'deductions') loadDeductions();
+            if (sectionId === 'reports') updateReportsSection();
+        }
+
+        // Update Reports Section
+        function updateReportsSection() {
+            const t = translations[currentLang];
+            
+            // Update labels
+            document.querySelector('#reports h2').textContent = t.reportsTitle;
+            document.querySelector('#reports h3').textContent = t.reportCreateTitle;
+            document.getElementById('reportStartDateLabel').textContent = t.reportStartDateLabel;
+            document.getElementById('reportEndDateLabel').textContent = t.reportEndDateLabel;
+            document.getElementById('generateReportBtn').textContent = t.generateReportBtn;
+            
+            // Set default dates (last 30 days)
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
+            document.getElementById('reportStartDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+        }
+
+        // Load Employees
+        function loadEmployees() {
+            const tbody = document.getElementById('employeesTableBody');
+            const t = translations[currentLang];
+            tbody.innerHTML = '';
+            
+            employees.forEach(emp => {
+                const name = currentLang === 'ar' ? emp.nameAr : emp.nameEn;
+                const position = currentLang === 'ar' ? emp.position : emp.positionEn;
+                const department = currentLang === 'ar' ? emp.department : emp.departmentEn;
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${emp.code}</td>
+                        <td>${name}</td>
+                        <td>${position}</td>
+                        <td>${department}</td>
+                        <td>${emp.status}</td>
+                        <td>${emp.firstHire}</td>
+                    </tr>
+                `;
+            });
+            
+            // Update table headers
+            const headers = document.querySelectorAll('#employeesTable th');
+            headers[0].textContent = t.tableCode;
+            headers[1].textContent = t.tableName;
+            headers[2].textContent = t.tablePosition;
+            headers[3].textContent = t.tableDepartment;
+            headers[4].textContent = t.tableStatus;
+            headers[5].textContent = t.tableHireDate;
+        }
+
+        // Search Employees
+        function searchEmployees() {
+            const searchTerm = document.getElementById('employeeSearch').value.toLowerCase();
+            const tbody = document.getElementById('employeesTableBody');
+            const t = translations[currentLang];
+            tbody.innerHTML = '';
+            
+            const filtered = employees.filter(emp => 
+                emp.nameAr.toLowerCase().includes(searchTerm) || 
+                emp.nameEn.toLowerCase().includes(searchTerm) ||
+                emp.code.toLowerCase().includes(searchTerm)
+            );
+            
+            filtered.forEach(emp => {
+                const name = currentLang === 'ar' ? emp.nameAr : emp.nameEn;
+                const position = currentLang === 'ar' ? emp.position : emp.positionEn;
+                const department = currentLang === 'ar' ? emp.department : emp.departmentEn;
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${emp.code}</td>
+                        <td>${name}</td>
+                        <td>${position}</td>
+                        <td>${department}</td>
+                        <td>${emp.status}</td>
+                        <td>${emp.firstHire}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Populate Employee Dropdowns
+        function populateEmployeeDropdowns() {
+            const t = translations[currentLang];
+            const dropdowns = ['leaveEmployee', 'permissionEmployee', 'deductionEmployee'];
+            dropdowns.forEach(id => {
+                const select = document.getElementById(id);
+                select.innerHTML = `<option value="">${t.modalSelectEmployee}</option>`;
+                employees.forEach(emp => {
+                    const name = currentLang === 'ar' ? emp.nameAr : emp.nameEn;
+                    select.innerHTML += `<option value="${emp.code}">${name} (${emp.code})</option>`;
+                });
+            });
+            
+            // Update all modal labels
+            updateModalLabels();
+        }
+        
+        // Update Modal Labels
+        function updateModalLabels() {
+            const t = translations[currentLang];
+            
+            // Leave Modal Labels
+            const leaveLabels = document.querySelectorAll('#leaveForm label');
+            if (leaveLabels.length >= 5) {
+                leaveLabels[0].textContent = t.modalEmployee;
+                leaveLabels[1].textContent = t.modalLeaveTypeLabel;
+                leaveLabels[2].textContent = t.modalFromDate;
+                leaveLabels[3].textContent = t.modalToDate;
+                leaveLabels[4].textContent = t.modalReason;
+            }
+            
+            // Update leave type options
+            const leaveTypeSelect = document.getElementById('leaveType');
+            if (leaveTypeSelect) {
+                leaveTypeSelect.innerHTML = `
+                    <option value="annual">${t.modalLeaveTypeAnnual}</option>
+                    <option value="sick">${t.modalLeaveTypeSick}</option>
+                    <option value="emergency">${t.modalLeaveTypeEmergency}</option>
+                    <option value="unpaid">${t.modalLeaveTypeUnpaid}</option>
+                `;
+            }
+            
+            // Update leave form submit button
+            const leaveSubmit = document.querySelector('#leaveForm button[type="submit"]');
+            if (leaveSubmit) leaveSubmit.textContent = t.modalSubmit;
+            
+            // Permission Modal Labels
+            const permissionLabels = document.querySelectorAll('#permissionForm label');
+            if (permissionLabels.length >= 5) {
+                permissionLabels[0].textContent = t.modalEmployee;
+                permissionLabels[1].textContent = t.modalDate;
+                permissionLabels[2].textContent = t.modalFromTime;
+                permissionLabels[3].textContent = t.modalToTime;
+                permissionLabels[4].textContent = t.modalReason;
+            }
+            
+            // Update permission form submit button
+            const permissionSubmit = document.querySelector('#permissionForm button[type="submit"]');
+            if (permissionSubmit) permissionSubmit.textContent = t.modalSubmit;
+            
+            // Training Modal Labels
+            const trainingLabels = document.querySelectorAll('#trainingForm label');
+            if (trainingLabels.length >= 5) {
+                trainingLabels[0].textContent = t.modalTrainingNameLabel;
+                trainingLabels[1].textContent = t.modalInstructor;
+                trainingLabels[2].textContent = t.modalStartDate;
+                trainingLabels[3].textContent = t.modalEndDate;
+                trainingLabels[4].textContent = t.modalCost;
+            }
+            
+            // Update training form submit button
+            const trainingSubmit = document.querySelector('#trainingForm button[type="submit"]');
+            if (trainingSubmit) trainingSubmit.textContent = t.modalAddTraining;
+            
+            // Deduction Modal Labels
+            const deductionLabels = document.querySelectorAll('#deductionForm label');
+            if (deductionLabels.length >= 5) {
+                deductionLabels[0].textContent = t.modalEmployee;
+                deductionLabels[1].textContent = t.modalDeductionTypeLabel;
+                deductionLabels[2].textContent = t.modalAmount;
+                deductionLabels[3].textContent = t.modalDate;
+                deductionLabels[4].textContent = t.modalReason;
+            }
+            
+            // Update deduction type options
+            const deductionTypeSelect = document.getElementById('deductionType');
+            if (deductionTypeSelect) {
+                deductionTypeSelect.innerHTML = `
+                    <option value="absence">${t.modalDeductionAbsence}</option>
+                    <option value="late">${t.modalDeductionLate}</option>
+                    <option value="damage">${t.modalDeductionDamage}</option>
+                    <option value="other">${t.modalDeductionOther}</option>
+                `;
+            }
+            
+            // Update deduction form submit button
+            const deductionSubmit = document.querySelector('#deductionForm button[type="submit"]');
+            if (deductionSubmit) deductionSubmit.textContent = t.modalAddDeduction;
+        }
+
+        // Load Leaves
+        function loadLeaves() {
+            const leaves = JSON.parse(localStorage.getItem('leaves') || '[]');
+            const tbody = document.getElementById('leavesTableBody');
+            const t = translations[currentLang];
+            tbody.innerHTML = '';
+            
+            // Update table headers
+            const headers = document.querySelectorAll('#leaves table th');
+            headers[0].textContent = t.leaveRequestNo;
+            headers[1].textContent = t.leaveEmployeeName;
+            headers[2].textContent = t.leaveType;
+            headers[3].textContent = t.leaveFrom;
+            headers[4].textContent = t.leaveTo;
+            headers[5].textContent = t.leaveDays;
+            headers[6].textContent = t.leaveStatus;
+            headers[7].textContent = t.leaveActions;
+            
+            // Update button text
+            document.querySelectorAll('#leaves .btn')[0].textContent = t.newLeaveBtn;
+            
+            if (leaves.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #999;">${t.noLeaves}</td></tr>`;
+                return;
+            }
+            
+            leaves.forEach((leave, index) => {
+                const employee = employees.find(e => e.code === leave.employeeCode);
+                const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : (currentLang === 'ar' ? 'غير معروف' : 'Unknown');
+                const statusClass = leave.status === 'pending' ? 'status-pending' : 
+                                  leave.status === 'approved' ? 'status-approved' : 'status-rejected';
+                const statusText = leave.status === 'pending' ? t.statusPending : 
+                                 leave.status === 'approved' ? t.statusApproved : t.statusRejected;
+                
+                // Translate leave type
+                const leaveTypeMap = {
+                    'annual': currentLang === 'ar' ? 'سنوية' : 'Annual',
+                    'sick': currentLang === 'ar' ? 'مرضية' : 'Sick',
+                    'emergency': currentLang === 'ar' ? 'طارئة' : 'Emergency',
+                    'unpaid': currentLang === 'ar' ? 'بدون راتب' : 'Unpaid'
+                };
+                const leaveTypeText = leaveTypeMap[leave.type] || leave.type;
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>#${index + 1}</td>
+                        <td>${employeeName}</td>
+                        <td>${leaveTypeText}</td>
+                        <td>${leave.startDate}</td>
+                        <td>${leave.endDate}</td>
+                        <td>${leave.days}</td>
+                        <td><span class="status ${statusClass}">${statusText}</span></td>
+                        <td>
+                            ${leave.status === 'pending' ? `
+                                <button class="btn btn-approve" onclick="approveLeave(${index})">${t.approveBtn}</button>
+                                <button class="btn btn-reject" onclick="rejectLeave(${index})">${t.rejectBtn}</button>
+                            ` : '-'}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Load Permissions
+        function loadPermissions() {
+            const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+            const tbody = document.getElementById('permissionsTableBody');
+            const t = translations[currentLang];
+            tbody.innerHTML = '';
+            
+            // Update table headers
+            const headers = document.querySelectorAll('#permissions table th');
+            headers[0].textContent = t.leaveRequestNo;
+            headers[1].textContent = t.leaveEmployeeName;
+            headers[2].textContent = t.permissionDate;
+            headers[3].textContent = t.permissionFromTime;
+            headers[4].textContent = t.permissionToTime;
+            headers[5].textContent = t.permissionDuration;
+            headers[6].textContent = t.leaveStatus;
+            headers[7].textContent = t.leaveActions;
+            
+            // Update button text
+            document.querySelectorAll('#permissions .btn')[0].textContent = t.newPermissionBtn;
+            
+            if (permissions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #999;">${t.noPermissions}</td></tr>`;
+                return;
+            }
+            
+            permissions.forEach((perm, index) => {
+                const employee = employees.find(e => e.code === perm.employeeCode);
+                const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : (currentLang === 'ar' ? 'غير معروف' : 'Unknown');
+                const statusClass = perm.status === 'pending' ? 'status-pending' : 
+                                  perm.status === 'approved' ? 'status-approved' : 'status-rejected';
+                const statusText = perm.status === 'pending' ? t.statusPending : 
+                                 perm.status === 'approved' ? t.statusApproved : t.statusRejected;
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>#${index + 1}</td>
+                        <td>${employeeName}</td>
+                        <td>${perm.date}</td>
+                        <td>${perm.startTime}</td>
+                        <td>${perm.endTime}</td>
+                        <td>${perm.duration}</td>
+                        <td><span class="status ${statusClass}">${statusText}</span></td>
+                        <td>
+                            ${perm.status === 'pending' ? `
+                                <button class="btn btn-approve" onclick="approvePermission(${index})">${t.approveBtn}</button>
+                                <button class="btn btn-reject" onclick="rejectPermission(${index})">${t.rejectBtn}</button>
+                            ` : '-'}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Load Trainings
+        function loadTrainings() {
+            const trainings = JSON.parse(localStorage.getItem('trainings') || '[]');
+            const tbody = document.getElementById('trainingTableBody');
+            const t = translations[currentLang];
+            tbody.innerHTML = '';
+            
+            // Update table headers
+            const headers = document.querySelectorAll('#training table th');
+            headers[0].textContent = t.trainingName;
+            headers[1].textContent = t.trainingInstructor;
+            headers[2].textContent = t.trainingEmployees;
+            headers[3].textContent = t.trainingStartDate;
+            headers[4].textContent = t.trainingEndDate;
+            headers[5].textContent = t.trainingCost;
+            headers[6].textContent = t.trainingStatus;
+            
+            // Update button text
+            document.querySelectorAll('#training .btn')[0].textContent = t.newTrainingBtn;
+            
+            if (trainings.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #999;">${t.noTraining}</td></tr>`;
+                return;
+            }
+            
+            trainings.forEach(training => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${training.name}</td>
+                        <td>${training.instructor}</td>
+                        <td>${training.employees || 0}</td>
+                        <td>${training.startDate}</td>
+                        <td>${training.endDate}</td>
+                        <td>${training.cost} ${t.currency}</td>
+                        <td><span class="status status-approved">${t.active}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Load Deductions
+        function loadDeductions() {
+            const deductions = JSON.parse(localStorage.getItem('deductions') || '[]');
+            const tbody = document.getElementById('deductionsTableBody');
+            const t = translations[currentLang];
+            tbody.innerHTML = '';
+            
+            // Update table headers
+            const headers = document.querySelectorAll('#deductions table th');
+            headers[0].textContent = t.leaveEmployeeName;
+            headers[1].textContent = t.deductionType;
+            headers[2].textContent = t.deductionAmount;
+            headers[3].textContent = t.deductionDate;
+            headers[4].textContent = t.deductionReason;
+            headers[5].textContent = t.leaveActions;
+            
+            // Update button text
+            document.querySelectorAll('#deductions .btn')[0].textContent = t.newDeductionBtn;
+            
+            if (deductions.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #999;">${t.noDeductions}</td></tr>`;
+                return;
+            }
+            
+            deductions.forEach((ded, index) => {
+                const employee = employees.find(e => e.code === ded.employeeCode);
+                const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : (currentLang === 'ar' ? 'غير معروف' : 'Unknown');
+                
+                // Translate deduction type
+                const deductionTypeMap = {
+                    'absence': currentLang === 'ar' ? 'غياب' : 'Absence',
+                    'late': currentLang === 'ar' ? 'تأخير' : 'Late',
+                    'damage': currentLang === 'ar' ? 'أضرار' : 'Damage',
+                    'other': currentLang === 'ar' ? 'أخرى' : 'Other'
+                };
+                const deductionTypeText = deductionTypeMap[ded.type] || ded.type;
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${employeeName}</td>
+                        <td>${deductionTypeText}</td>
+                        <td>${ded.amount} ${t.currency}</td>
+                        <td>${ded.date}</td>
+                        <td>${ded.reason}</td>
+                        <td><button class="btn btn-reject" onclick="deleteDeduction(${index})">${t.deleteBtn}</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Modal Functions
+        function openLeaveModal() {
+            document.getElementById('leaveModal').classList.add('active');
+        }
+
+        function openPermissionModal() {
+            document.getElementById('permissionModal').classList.add('active');
+        }
+
+        function openTrainingModal() {
+            document.getElementById('trainingModal').classList.add('active');
+        }
+
+        function openDeductionModal() {
+            document.getElementById('deductionModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Form Submissions
+        document.getElementById('leaveForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const t = translations[currentLang];
+            
+            const startDate = new Date(document.getElementById('leaveStartDate').value);
+            const endDate = new Date(document.getElementById('leaveEndDate').value);
+            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            
+            const employeeCode = document.getElementById('leaveEmployee').value;
+            const employee = employees.find(e => e.code === employeeCode);
+            const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+            
+            const leave = {
+                employeeCode: employeeCode,
+                employeeName: employeeName,
+                type: document.getElementById('leaveType').value,
+                startDate: document.getElementById('leaveStartDate').value,
+                endDate: document.getElementById('leaveEndDate').value,
+                days: days,
+                reason: document.getElementById('leaveReason').value,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            const leaves = JSON.parse(localStorage.getItem('leaves') || '[]');
+            leaves.push(leave);
+            localStorage.setItem('leaves', JSON.stringify(leaves));
+            
+            // Send email with Excel attachment
+            sendLeaveRequestEmail(leave, t);
+            
+            closeModal('leaveModal');
+            this.reset();
+            loadLeaves();
+            updateDashboard();
+            alert(t.alertLeaveSuccess + '\n' + t.emailSent);
+        });
+
+        document.getElementById('permissionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const t = translations[currentLang];
+            
+            const startTime = document.getElementById('permissionStartTime').value;
+            const endTime = document.getElementById('permissionEndTime').value;
+            const start = new Date('2000-01-01 ' + startTime);
+            const end = new Date('2000-01-01 ' + endTime);
+            const duration = Math.round((end - start) / (1000 * 60)) + ' ' + t.minutes;
+            
+            const employeeCode = document.getElementById('permissionEmployee').value;
+            const employee = employees.find(e => e.code === employeeCode);
+            const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+            
+            const permission = {
+                employeeCode: employeeCode,
+                employeeName: employeeName,
+                date: document.getElementById('permissionDate').value,
+                startTime: startTime,
+                endTime: endTime,
+                duration: duration,
+                reason: document.getElementById('permissionReason').value,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+            permissions.push(permission);
+            localStorage.setItem('permissions', JSON.stringify(permissions));
+            
+            // Send email with Excel attachment
+            sendPermissionRequestEmail(permission, t);
+            
+            closeModal('permissionModal');
+            this.reset();
+            loadPermissions();
+            updateDashboard();
+            alert(t.alertPermissionSuccess + '\n' + t.emailSent);
+        });
+
+        document.getElementById('trainingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const t = translations[currentLang];
+            
+            const training = {
+                name: document.getElementById('trainingName').value,
+                instructor: document.getElementById('trainingInstructor').value,
+                startDate: document.getElementById('trainingStartDate').value,
+                endDate: document.getElementById('trainingEndDate').value,
+                cost: document.getElementById('trainingCost').value,
+                employees: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            const trainings = JSON.parse(localStorage.getItem('trainings') || '[]');
+            trainings.push(training);
+            localStorage.setItem('trainings', JSON.stringify(trainings));
+            
+            // Send email with Excel attachment
+            sendTrainingEmail(training, t);
+            
+            closeModal('trainingModal');
+            this.reset();
+            loadTrainings();
+            updateDashboard();
+            alert(t.alertTrainingSuccess + '\n' + t.emailSent);
+        });
+
+        document.getElementById('deductionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const t = translations[currentLang];
+            
+            const employeeCode = document.getElementById('deductionEmployee').value;
+            const employee = employees.find(e => e.code === employeeCode);
+            const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+            
+            const deduction = {
+                employeeCode: employeeCode,
+                employeeName: employeeName,
+                type: document.getElementById('deductionType').value,
+                amount: document.getElementById('deductionAmount').value,
+                date: document.getElementById('deductionDate').value,
+                reason: document.getElementById('deductionReason').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            const deductions = JSON.parse(localStorage.getItem('deductions') || '[]');
+            deductions.push(deduction);
+            localStorage.setItem('deductions', JSON.stringify(deductions));
+            
+            // Send email with Excel attachment
+            sendDeductionEmail(deduction, t);
+            
+            closeModal('deductionModal');
+            this.reset();
+            loadDeductions();
+            alert(t.alertDeductionSuccess + '\n' + t.emailSent);
+        });
+
+        // Approve/Reject Functions
+        function approveLeave(index) {
+            const t = translations[currentLang];
+            const leaves = JSON.parse(localStorage.getItem('leaves') || '[]');
+            leaves[index].status = 'approved';
+            localStorage.setItem('leaves', JSON.stringify(leaves));
+            loadLeaves();
+            updateDashboard();
+            alert(t.alertLeaveApproved);
+        }
+
+        function rejectLeave(index) {
+            const t = translations[currentLang];
+            const leaves = JSON.parse(localStorage.getItem('leaves') || '[]');
+            leaves[index].status = 'rejected';
+            localStorage.setItem('leaves', JSON.stringify(leaves));
+            loadLeaves();
+            updateDashboard();
+            alert(t.alertLeaveRejected);
+        }
+
+        function approvePermission(index) {
+            const t = translations[currentLang];
+            const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+            permissions[index].status = 'approved';
+            localStorage.setItem('permissions', JSON.stringify(permissions));
+            loadPermissions();
+            updateDashboard();
+            alert(t.alertPermissionApproved);
+        }
+
+        function rejectPermission(index) {
+            const t = translations[currentLang];
+            const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+            permissions[index].status = 'rejected';
+            localStorage.setItem('permissions', JSON.stringify(permissions));
+            loadPermissions();
+            updateDashboard();
+            alert(t.alertPermissionRejected);
+        }
+
+        function deleteDeduction(index) {
+            const t = translations[currentLang];
+            if (confirm(t.confirmDelete)) {
+                const deductions = JSON.parse(localStorage.getItem('deductions') || '[]');
+                deductions.splice(index, 1);
+                localStorage.setItem('deductions', JSON.stringify(deductions));
+                loadDeductions();
+                alert(t.alertDeductionDeleted);
+            }
+        }
+
+        // Generate Report Function
+        function generateReport() {
+            const t = translations[currentLang];
+            const startDateInput = document.getElementById('reportStartDate').value;
+            const endDateInput = document.getElementById('reportEndDate').value;
+            
+            if (!startDateInput || !endDateInput) {
+                alert(currentLang === 'ar' ? 'الرجاء اختيار نطاق التاريخ' : 'Please select a date range');
+                return;
+            }
+            
+            const startDate = new Date(startDateInput);
+            const endDate = new Date(endDateInput);
+            
+            if (startDate > endDate) {
+                alert(currentLang === 'ar' ? 'تاريخ البداية يجب أن يكون قبل تاريخ النهاية' : 'Start date must be before end date');
+                return;
+            }
+            
+            // Fetch all data
+            const leaves = JSON.parse(localStorage.getItem('leaves') || '[]');
+            const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+            const trainings = JSON.parse(localStorage.getItem('trainings') || '[]');
+            const deductions = JSON.parse(localStorage.getItem('deductions') || '[]');
+            
+            // Filter data by date range
+            const filteredLeaves = leaves.filter(item => {
+                const itemDate = new Date(item.createdAt || item.startDate);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            const filteredPermissions = permissions.filter(item => {
+                const itemDate = new Date(item.createdAt || item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            const filteredTrainings = trainings.filter(item => {
+                const itemDate = new Date(item.createdAt || item.startDate);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            const filteredDeductions = deductions.filter(item => {
+                const itemDate = new Date(item.createdAt || item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            // Calculate statistics
+            const leaveStats = {
+                total: filteredLeaves.length,
+                approved: filteredLeaves.filter(l => l.status === 'approved').length,
+                rejected: filteredLeaves.filter(l => l.status === 'rejected').length,
+                pending: filteredLeaves.filter(l => l.status === 'pending').length,
+                totalDays: filteredLeaves.reduce((sum, l) => sum + (l.days || 0), 0)
+            };
+            
+            const permissionStats = {
+                total: filteredPermissions.length,
+                approved: filteredPermissions.filter(p => p.status === 'approved').length,
+                rejected: filteredPermissions.filter(p => p.status === 'rejected').length,
+                pending: filteredPermissions.filter(p => p.status === 'pending').length
+            };
+            
+            const trainingStats = {
+                total: filteredTrainings.length,
+                totalCost: filteredTrainings.reduce((sum, tr) => sum + parseFloat(tr.cost || 0), 0)
+            };
+            
+            const deductionStats = {
+                total: filteredDeductions.length,
+                totalAmount: filteredDeductions.reduce((sum, d) => sum + parseFloat(d.amount || 0), 0)
+            };
+            
+            // Update report period
+            const periodText = `${startDateInput} ${currentLang === 'ar' ? 'إلى' : 'to'} ${endDateInput}`;
+            document.getElementById('reportPeriod').textContent = `${t.reportPeriodLabel} ${periodText}`;
+            document.getElementById('reportTitle').textContent = t.reportTitle;
+            document.getElementById('printReportBtn').textContent = t.printReportBtn;
+            
+            // Generate report HTML
+            let reportHTML = `
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #2193b0; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #eee;">${t.reportSummaryTitle}</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div style="background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%); color: white; padding: 20px; border-radius: 10px;">
+                            <h4 style="margin-bottom: 10px; opacity: 0.9;">${t.reportLeavesSection}</h4>
+                            <p style="font-size: 2em; font-weight: bold; margin: 10px 0;">${leaveStats.total}</p>
+                            <div style="font-size: 0.9em; opacity: 0.9;">
+                                <p>✅ ${t.reportApproved}: ${leaveStats.approved}</p>
+                                <p>❌ ${t.reportRejected}: ${leaveStats.rejected}</p>
+                                <p>⏳ ${t.reportPending}: ${leaveStats.pending}</p>
+                                <p>📅 ${t.reportTotalDays}: ${leaveStats.totalDays}</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%); color: white; padding: 20px; border-radius: 10px;">
+                            <h4 style="margin-bottom: 10px; opacity: 0.9;">${t.reportPermissionsSection}</h4>
+                            <p style="font-size: 2em; font-weight: bold; margin: 10px 0;">${permissionStats.total}</p>
+                            <div style="font-size: 0.9em; opacity: 0.9;">
+                                <p>✅ ${t.reportApproved}: ${permissionStats.approved}</p>
+                                <p>❌ ${t.reportRejected}: ${permissionStats.rejected}</p>
+                                <p>⏳ ${t.reportPending}: ${permissionStats.pending}</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, #039be5 0%, #4fc3f7 100%); color: white; padding: 20px; border-radius: 10px;">
+                            <h4 style="margin-bottom: 10px; opacity: 0.9;">${t.reportTrainingSection}</h4>
+                            <p style="font-size: 2em; font-weight: bold; margin: 10px 0;">${trainingStats.total}</p>
+                            <div style="font-size: 0.9em; opacity: 0.9;">
+                                <p>📚 ${t.reportTotalCourses}: ${trainingStats.total}</p>
+                                <p>💰 ${t.reportTotalCost}: ${trainingStats.totalCost.toFixed(2)} ${t.currency}</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, #0277bd 0%, #0288d1 100%); color: white; padding: 20px; border-radius: 10px;">
+                            <h4 style="margin-bottom: 10px; opacity: 0.9;">${t.reportDeductionsSection}</h4>
+                            <p style="font-size: 2em; font-weight: bold; margin: 10px 0;">${deductionStats.total}</p>
+                            <div style="font-size: 0.9em; opacity: 0.9;">
+                                <p>📊 ${t.reportTotalDeductions}: ${deductionStats.total}</p>
+                                <p>💰 ${t.reportTotalAmount}: ${deductionStats.totalAmount.toFixed(2)} ${t.currency}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add detailed sections if there's data
+            if (filteredLeaves.length > 0) {
+                reportHTML += generateDetailedSection(t.reportLeavesSection, filteredLeaves, 'leave', t);
+            }
+            
+            if (filteredPermissions.length > 0) {
+                reportHTML += generateDetailedSection(t.reportPermissionsSection, filteredPermissions, 'permission', t);
+            }
+            
+            if (filteredTrainings.length > 0) {
+                reportHTML += generateDetailedSection(t.reportTrainingSection, filteredTrainings, 'training', t);
+            }
+            
+            if (filteredDeductions.length > 0) {
+                reportHTML += generateDetailedSection(t.reportDeductionsSection, filteredDeductions, 'deduction', t);
+            }
+            
+            if (leaveStats.total === 0 && permissionStats.total === 0 && trainingStats.total === 0 && deductionStats.total === 0) {
+                reportHTML = `<p style="text-align: center; color: #999; padding: 60px; font-size: 1.2em;">${t.reportNoData}</p>`;
+            }
+            
+            document.getElementById('reportContent').innerHTML = reportHTML;
+            document.getElementById('reportOutput').style.display = 'block';
+            
+            // Scroll to report
+            document.getElementById('reportOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Generate Detailed Section for Report
+        function generateDetailedSection(title, data, type, t) {
+            let html = `
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #2193b0; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #eee;">${title} - ${t.reportDetailsTitle}</h3>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #2193b0; color: white;">
+            `;
+            
+            // Add headers based on type
+            if (type === 'leave') {
+                html += `
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportEmployee}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportType}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.leaveFrom}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.leaveTo}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportDays}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportStatus}</th>
+                `;
+            } else if (type === 'permission') {
+                html += `
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportEmployee}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportDate}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.permissionFromTime}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.permissionToTime}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportDuration}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportStatus}</th>
+                `;
+            } else if (type === 'training') {
+                html += `
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.trainingName}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportInstructor}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.trainingStartDate}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.trainingEndDate}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportCost}</th>
+                `;
+            } else if (type === 'deduction') {
+                html += `
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportEmployee}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportType}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportAmount}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportDate}</th>
+                    <th style="padding: 12px; text-align: ${currentLang === 'ar' ? 'right' : 'left'};">${t.reportReason}</th>
+                `;
+            }
+            
+            html += `</tr></thead><tbody>`;
+            
+            // Add data rows
+            data.forEach((item, index) => {
+                const bgColor = index % 2 === 0 ? '#f8f9ff' : 'white';
+                html += `<tr style="background: ${bgColor}; border-bottom: 1px solid #eee;">`;
+                
+                if (type === 'leave') {
+                    const employee = employees.find(e => e.code === item.employeeCode);
+                    const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+                    const leaveTypeMap = {
+                        'annual': currentLang === 'ar' ? 'سنوية' : 'Annual',
+                        'sick': currentLang === 'ar' ? 'مرضية' : 'Sick',
+                        'emergency': currentLang === 'ar' ? 'طارئة' : 'Emergency',
+                        'unpaid': currentLang === 'ar' ? 'بدون راتب' : 'Unpaid'
+                    };
+                    const statusText = item.status === 'pending' ? t.statusPending : 
+                                     item.status === 'approved' ? t.statusApproved : t.statusRejected;
+                    
+                    html += `
+                        <td style="padding: 12px;">${employeeName}</td>
+                        <td style="padding: 12px;">${leaveTypeMap[item.type] || item.type}</td>
+                        <td style="padding: 12px;">${item.startDate}</td>
+                        <td style="padding: 12px;">${item.endDate}</td>
+                        <td style="padding: 12px;">${item.days}</td>
+                        <td style="padding: 12px;">${statusText}</td>
+                    `;
+                } else if (type === 'permission') {
+                    const employee = employees.find(e => e.code === item.employeeCode);
+                    const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+                    const statusText = item.status === 'pending' ? t.statusPending : 
+                                     item.status === 'approved' ? t.statusApproved : t.statusRejected;
+                    
+                    html += `
+                        <td style="padding: 12px;">${employeeName}</td>
+                        <td style="padding: 12px;">${item.date}</td>
+                        <td style="padding: 12px;">${item.startTime}</td>
+                        <td style="padding: 12px;">${item.endTime}</td>
+                        <td style="padding: 12px;">${item.duration}</td>
+                        <td style="padding: 12px;">${statusText}</td>
+                    `;
+                } else if (type === 'training') {
+                    html += `
+                        <td style="padding: 12px;">${item.name}</td>
+                        <td style="padding: 12px;">${item.instructor}</td>
+                        <td style="padding: 12px;">${item.startDate}</td>
+                        <td style="padding: 12px;">${item.endDate}</td>
+                        <td style="padding: 12px;">${item.cost} ${t.currency}</td>
+                    `;
+                } else if (type === 'deduction') {
+                    const employee = employees.find(e => e.code === item.employeeCode);
+                    const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+                    const deductionTypeMap = {
+                        'absence': currentLang === 'ar' ? 'غياب' : 'Absence',
+                        'late': currentLang === 'ar' ? 'تأخير' : 'Late',
+                        'damage': currentLang === 'ar' ? 'أضرار' : 'Damage',
+                        'other': currentLang === 'ar' ? 'أخرى' : 'Other'
+                    };
+                    
+                    html += `
+                        <td style="padding: 12px;">${employeeName}</td>
+                        <td style="padding: 12px;">${deductionTypeMap[item.type] || item.type}</td>
+                        <td style="padding: 12px;">${item.amount} ${t.currency}</td>
+                        <td style="padding: 12px;">${item.date}</td>
+                        <td style="padding: 12px;">${item.reason}</td>
+                    `;
+                }
+                
+                html += `</tr>`;
+            });
+            
+            html += `</tbody></table></div></div>`;
+            return html;
+        }
+
+        // Print Report Function
+        function printReport() {
+            window.print();
+        }
+
+        // Update Dashboard Statistics
+        function updateDashboard() {
+            const leaves = JSON.parse(localStorage.getItem('leaves') || '[]');
+            const permissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+            const trainings = JSON.parse(localStorage.getItem('trainings') || '[]');
+            
+            document.getElementById('statEmployees').textContent = employees.length;
+            document.getElementById('statPendingLeaves').textContent = leaves.filter(l => l.status === 'pending').length;
+            document.getElementById('statPendingPermissions').textContent = permissions.filter(p => p.status === 'pending').length;
+            document.getElementById('statTrainings').textContent = trainings.length;
+            document.getElementById('totalEmployees').textContent = employees.length;
+        }
+
+        // Set Current Date
+        function setCurrentDate() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ar-EG', options);
+        }
+
+        // ========== EMAIL & EXCEL EXPORT FUNCTIONS ==========
+        
+        // Create Excel File from Data
+        function createExcelFile(data, filename, t) {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet([data]);
+            XLSX.utils.book_append_sheet(wb, ws, "Request");
+            XLSX.writeFile(wb, filename + '.xlsx');
+        }
+
+        // Send Leave Request Email
+        function sendLeaveRequestEmail(leave, t) {
+            const employee = employees.find(e => e.code === leave.employeeCode);
+            const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+            const employeePosition = employee ? (currentLang === 'ar' ? employee.position : employee.positionEn) : 'N/A';
+            const employeeDepartment = employee ? (currentLang === 'ar' ? employee.department : employee.departmentEn) : 'N/A';
+            
+            const leaveTypeMap = {
+                'annual': currentLang === 'ar' ? 'سنوية' : 'Annual',
+                'sick': currentLang === 'ar' ? 'مرضية' : 'Sick',
+                'emergency': currentLang === 'ar' ? 'طارئة' : 'Emergency',
+                'unpaid': currentLang === 'ar' ? 'بدون راتب' : 'Unpaid'
+            };
+            
+            // Create Excel data
+            const excelData = {
+                [t.emailBodyRequestType]: currentLang === 'ar' ? 'طلب إجازة' : 'Leave Request',
+                [t.tableCode]: leave.employeeCode,
+                [t.tableName]: employeeName,
+                [t.tablePosition]: employeePosition,
+                [t.tableDepartment]: employeeDepartment,
+                [t.emailBodyLeaveType]: leaveTypeMap[leave.type] || leave.type,
+                [t.emailBodyFromDate]: leave.startDate,
+                [t.emailBodyToDate]: leave.endDate,
+                [t.emailBodyDays]: leave.days,
+                [t.emailBodyReason]: leave.reason,
+                [t.reportDate]: new Date(leave.createdAt).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')
+            };
+            
+            const filename = `${t.excelFilenameLeave}_${leave.employeeCode}_${new Date().toISOString().split('T')[0]}`;
+            createExcelFile(excelData, filename, t);
+            
+            // Create email body
+            const emailBody = `${t.emailBodyIntro}
+
+${t.emailBodyRequestType} ${currentLang === 'ar' ? 'طلب إجازة' : 'Leave Request'}
+
+${t.emailBodyDetails}
+- ${t.tableCode}: ${leave.employeeCode}
+- ${t.tableName}: ${employeeName}
+- ${t.tablePosition}: ${employeePosition}
+- ${t.tableDepartment}: ${employeeDepartment}
+- ${t.emailBodyLeaveType}: ${leaveTypeMap[leave.type] || leave.type}
+- ${t.emailBodyFromDate}: ${leave.startDate}
+- ${t.emailBodyToDate}: ${leave.endDate}
+- ${t.emailBodyDays}: ${leave.days}
+- ${t.emailBodyReason}: ${leave.reason}
+
+${t.emailBodyAttachment}`;
+
+            // Open email client
+            const mailtoLink = `mailto:${EMAIL_CONFIG.to}?cc=${EMAIL_CONFIG.cc}&subject=${encodeURIComponent(t.emailSubjectLeave)}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+        }
+
+        // Send Permission Request Email
+        function sendPermissionRequestEmail(permission, t) {
+            const employee = employees.find(e => e.code === permission.employeeCode);
+            const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+            const employeePosition = employee ? (currentLang === 'ar' ? employee.position : employee.positionEn) : 'N/A';
+            const employeeDepartment = employee ? (currentLang === 'ar' ? employee.department : employee.departmentEn) : 'N/A';
+            
+            // Create Excel data
+            const excelData = {
+                [t.emailBodyRequestType]: currentLang === 'ar' ? 'طلب إذن' : 'Permission Request',
+                [t.tableCode]: permission.employeeCode,
+                [t.tableName]: employeeName,
+                [t.tablePosition]: employeePosition,
+                [t.tableDepartment]: employeeDepartment,
+                [t.emailBodyDate]: permission.date,
+                [t.emailBodyFromTime]: permission.startTime,
+                [t.emailBodyToTime]: permission.endTime,
+                [t.emailBodyDuration]: permission.duration,
+                [t.emailBodyReason]: permission.reason,
+                [t.reportDate]: new Date(permission.createdAt).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')
+            };
+            
+            const filename = `${t.excelFilenamePermission}_${permission.employeeCode}_${new Date().toISOString().split('T')[0]}`;
+            createExcelFile(excelData, filename, t);
+            
+            // Create email body
+            const emailBody = `${t.emailBodyIntro}
+
+${t.emailBodyRequestType} ${currentLang === 'ar' ? 'طلب إذن' : 'Permission Request'}
+
+${t.emailBodyDetails}
+- ${t.tableCode}: ${permission.employeeCode}
+- ${t.tableName}: ${employeeName}
+- ${t.tablePosition}: ${employeePosition}
+- ${t.tableDepartment}: ${employeeDepartment}
+- ${t.emailBodyDate}: ${permission.date}
+- ${t.emailBodyFromTime}: ${permission.startTime}
+- ${t.emailBodyToTime}: ${permission.endTime}
+- ${t.emailBodyDuration}: ${permission.duration}
+- ${t.emailBodyReason}: ${permission.reason}
+
+${t.emailBodyAttachment}`;
+
+            // Open email client
+            const mailtoLink = `mailto:${EMAIL_CONFIG.to}?cc=${EMAIL_CONFIG.cc}&subject=${encodeURIComponent(t.emailSubjectPermission)}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+        }
+
+        // Send Training Email
+        function sendTrainingEmail(training, t) {
+            // Create Excel data
+            const excelData = {
+                [t.emailBodyRequestType]: currentLang === 'ar' ? 'دورة تدريبية' : 'Training Course',
+                [t.emailBodyCourseName]: training.name,
+                [t.emailBodyInstructor]: training.instructor,
+                [t.emailBodyStartDate]: training.startDate,
+                [t.emailBodyEndDate]: training.endDate,
+                [t.emailBodyCost]: `${training.cost} ${t.currency}`,
+                [t.reportDate]: new Date(training.createdAt).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')
+            };
+            
+            const filename = `${t.excelFilenameTraining}_${new Date().toISOString().split('T')[0]}`;
+            createExcelFile(excelData, filename, t);
+            
+            // Create email body
+            const emailBody = `${t.emailBodyIntro}
+
+${t.emailBodyRequestType} ${currentLang === 'ar' ? 'دورة تدريبية' : 'Training Course'}
+
+${t.emailBodyDetails}
+- ${t.emailBodyCourseName}: ${training.name}
+- ${t.emailBodyInstructor}: ${training.instructor}
+- ${t.emailBodyStartDate}: ${training.startDate}
+- ${t.emailBodyEndDate}: ${training.endDate}
+- ${t.emailBodyCost}: ${training.cost} ${t.currency}
+
+${t.emailBodyAttachment}`;
+
+            // Open email client
+            const mailtoLink = `mailto:${EMAIL_CONFIG.to}?cc=${EMAIL_CONFIG.cc}&subject=${encodeURIComponent(t.emailSubjectTraining)}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+        }
+
+        // Send Deduction Email
+        function sendDeductionEmail(deduction, t) {
+            const employee = employees.find(e => e.code === deduction.employeeCode);
+            const employeeName = employee ? (currentLang === 'ar' ? employee.nameAr : employee.nameEn) : 'N/A';
+            const employeePosition = employee ? (currentLang === 'ar' ? employee.position : employee.positionEn) : 'N/A';
+            const employeeDepartment = employee ? (currentLang === 'ar' ? employee.department : employee.departmentEn) : 'N/A';
+            
+            const deductionTypeMap = {
+                'absence': currentLang === 'ar' ? 'غياب' : 'Absence',
+                'late': currentLang === 'ar' ? 'تأخير' : 'Late',
+                'damage': currentLang === 'ar' ? 'أضرار' : 'Damage',
+                'other': currentLang === 'ar' ? 'أخرى' : 'Other'
+            };
+            
+            // Create Excel data
+            const excelData = {
+                [t.emailBodyRequestType]: currentLang === 'ar' ? 'خصم' : 'Deduction',
+                [t.tableCode]: deduction.employeeCode,
+                [t.tableName]: employeeName,
+                [t.tablePosition]: employeePosition,
+                [t.tableDepartment]: employeeDepartment,
+                [t.emailBodyDeductionType]: deductionTypeMap[deduction.type] || deduction.type,
+                [t.emailBodyAmount]: `${deduction.amount} ${t.currency}`,
+                [t.emailBodyDate]: deduction.date,
+                [t.emailBodyReason]: deduction.reason,
+                [t.reportDate]: new Date(deduction.createdAt).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')
+            };
+            
+            const filename = `${t.excelFilenameDeduction}_${deduction.employeeCode}_${new Date().toISOString().split('T')[0]}`;
+            createExcelFile(excelData, filename, t);
+            
+            // Create email body
+            const emailBody = `${t.emailBodyIntro}
+
+${t.emailBodyRequestType} ${currentLang === 'ar' ? 'خصم' : 'Deduction'}
+
+${t.emailBodyDetails}
+- ${t.tableCode}: ${deduction.employeeCode}
+- ${t.tableName}: ${employeeName}
+- ${t.tablePosition}: ${employeePosition}
+- ${t.tableDepartment}: ${employeeDepartment}
+- ${t.emailBodyDeductionType}: ${deductionTypeMap[deduction.type] || deduction.type}
+- ${t.emailBodyAmount}: ${deduction.amount} ${t.currency}
+- ${t.emailBodyDate}: ${deduction.date}
+- ${t.emailBodyReason}: ${deduction.reason}
+
+${t.emailBodyAttachment}`;
+
+            // Open email client
+            const mailtoLink = `mailto:${EMAIL_CONFIG.to}?cc=${EMAIL_CONFIG.cc}&subject=${encodeURIComponent(t.emailSubjectDeduction)}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+        }
+
+        // Initialize on Load
+        window.onload = function() {
+            initializeStorage();
+            setCurrentDate();
+            loadEmployees();
+            populateEmployeeDropdowns();
+            updateDashboard();
+        };
+    </script>
+</body>
+</html>

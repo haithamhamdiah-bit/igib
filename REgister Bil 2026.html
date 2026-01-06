@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGIB Sales & Registration Dashboard 2026</title>
+    
+    <!-- Google Fonts: Cairo for Arabic/English support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9', // Light Blue
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#003781', // IGIB Dark Blue
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for table */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-bar-striped {
+            background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+            background-size: 1rem 1rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-brand-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-white p-1.5 rounded-full text-brand-900">
+                    <i class="fa-solid fa-chart-line text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide leading-tight flex flex-col">
+                        <span>IGIB <span class="text-brand-200 font-light" data-i18n="appTitle">Sales Dashboard</span></span>
+                    </h1>
+                    <div class="text-[10px] text-brand-200 uppercase tracking-widest" data-i18n="edition">2026 Edition</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <div id="currentDateDisplay" class="text-xs text-brand-100 opacity-80 mb-1"></div>
+                    <div class="text-sm font-semibold text-white flex items-center justify-end gap-2">
+                        <i class="fa-solid fa-user-circle text-brand-300"></i>
+                        <span id="userNameDisplay" data-i18n="guestUser">Guest User</span>
+                        <button onclick="changeUserName()" class="text-[10px] text-brand-400 hover:text-white transition" title="Change User Name">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Language Toggle -->
+                <button onclick="toggleLanguage()" class="bg-brand-800 hover:bg-brand-700 text-white px-3 py-1 rounded text-xs border border-brand-600 transition font-bold">
+                    <span id="langBtnText">العربية</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-[98%] mx-auto w-full py-6 gap-6 flex flex-col lg:flex-row">
+        
+        <!-- Sidebar / Controls -->
+        <aside class="w-full lg:w-72 flex-shrink-0 space-y-4">
+            <!-- Month Selector -->
+            <div class="bg-white rounded-lg shadow-sm p-4 border-s-4 border-brand-500">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2" data-i18n="selectPeriod">Select Period</label>
+                <select id="monthSelector" class="w-full bg-slate-50 border border-slate-300 rounded px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+
+            <!-- Sales Targets (UPDATED TO COMMISSION-BASED) -->
+            <div class="bg-white rounded-lg shadow-sm p-4 border-t border-slate-100">
+                <div class="flex justify-between items-end mb-3">
+                    <h3 class="text-sm font-bold text-slate-700 uppercase" data-i18n="salesTarget">Commission Target</h3>
+                    <button onclick="editTarget()" class="text-xs text-brand-600 hover:text-brand-800 flex items-center gap-1">
+                        <i class="fa-solid fa-pen"></i> <span data-i18n="edit">Edit</span>
+                    </button>
+                </div>
+                
+                <div class="mb-2">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-500" data-i18n="achieved">Achieved</span>
+                        <span class="font-bold text-slate-700" id="targetPercentage">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden" dir="ltr">
+                        <div id="targetProgressBar" class="bg-brand-500 h-3 rounded-full transition-all duration-1000 progress-bar-striped" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center text-xs mt-2 border-t pt-2">
+                    <div>
+                        <span class="block text-slate-400" data-i18n="target">Target</span>
+                        <span class="font-bold text-slate-600" id="targetDisplay">1,000,000</span>
+                    </div>
+                    <div class="text-end">
+                        <span class="block text-slate-400" data-i18n="gap">Gap</span>
+                        <span class="font-bold text-red-500" id="targetGap">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100 shadow-sm col-span-2">
+                    <div class="text-[10px] uppercase font-bold text-emerald-600 mb-1" data-i18n="totalPremium">Total Premium</div>
+                    <div id="statPremium" class="text-2xl font-bold text-emerald-700">0.00</div>
+                    <div class="text-[10px] text-emerald-600 mt-1 flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-up"></i> <span data-i18n="generatedMonth">Generated this month</span>
+                    </div>
+                </div>
+                
+                <div class="bg-amber-50 p-3 rounded-lg border border-amber-100 shadow-sm">
+                    <div class="text-[10px] uppercase font-bold text-amber-600 mb-1" data-i18n="netComm">Net Comm.</div>
+                    <div id="statCommission" class="text-lg font-bold text-amber-700">0.00</div>
+                </div>
+                
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 shadow-sm">
+                    <div class="text-[10px] uppercase font-bold text-blue-600 mb-1" data-i18n="policies">Policies</div>
+                    <div id="statCount" class="text-lg font-bold text-brand-900">0</div>
+                </div>
+            </div>
+
+            <!-- Top Producers (NEW) -->
+             <div class="bg-white rounded-lg shadow-sm p-4">
+                <h3 class="text-sm font-bold text-slate-700 uppercase mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-400"></i> <span data-i18n="topProducers">Top Producers</span>
+                </h3>
+                <div id="producersList" class="space-y-3">
+                    <!-- Populated by JS -->
+                    <div class="text-xs text-slate-400 text-center py-2" data-i18n="noData">No data yet</div>
+                </div>
+            </div>
+            
+            <!-- Tools -->
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <button onclick="exportToCSV()" class="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-3 rounded transition flex items-center justify-center gap-2 mb-3 shadow-sm">
+                    <i class="fa-solid fa-file-excel"></i> <span data-i18n="exportReport">Export Report</span>
+                </button>
+                <button onclick="clearMonthData()" class="w-full text-slate-400 text-xs hover:text-red-500 hover:bg-red-50 py-2 rounded transition flex items-center justify-center gap-2 border border-dashed border-slate-300">
+                    <i class="fa-solid fa-trash"></i> <span data-i18n="resetMonth">Reset Month</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <div class="flex-grow flex flex-col gap-6">
+            
+            <!-- Input Form -->
+            <section class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50 px-6 py-3 border-b border-slate-200 flex justify-between items-center cursor-pointer hover:bg-slate-100 transition" onclick="toggleForm()">
+                    <h2 class="font-bold text-brand-900 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-brand-500"></i> <span data-i18n="newEntry">New Policy Entry</span>
+                    </h2>
+                    <i id="formIcon" class="fa-solid fa-chevron-up text-slate-400"></i>
+                </div>
+                
+                <div id="inputFormContainer" class="p-6 transition-all duration-300">
+                    <form id="entryForm" onsubmit="event.preventDefault(); addEntry();" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        
+                        <!-- Core Info -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-4 mb-1">
+                            <h3 class="text-[11px] font-bold text-brand-600 uppercase tracking-wider border-b pb-1" data-i18n="policyInfo">Policy Information</h3>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="businessType">Business Type</label>
+                            <select id="businessType" class="w-full border border-slate-300 rounded px-2 py-1.5 bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500 text-brand-900 font-medium">
+                                <option value="New Business" selected data-i18n="newBusiness">New Business</option>
+                                <option value="New from Existing" data-i18n="newFromExisting">New from Existing</option>
+                                <option value="Renewal" data-i18n="renewal">Renewal</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="policyNo">Policy No</label>
+                            <input type="text" id="policyNo" placeholder="TBA" class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="endorsementNo">Endorsement No</label>
+                            <input type="text" id="endorsementNo" class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="lob">LOB (Line of Business)</label>
+                            <input type="text" list="lobList" id="lob" required class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                            <datalist id="lobList">
+                                <option>Motor</option>
+                                <option>Medical</option>
+                                <option>Credit Life</option>
+                                <option>Fire</option>
+                                <option>Property</option>
+                                <option>Engineering</option>
+                                <option>Marine</option>
+                            </datalist>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="carrier">Current Carrier</label>
+                            <input type="text" list="carrierList" id="carrier" placeholder="TBA" class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                            <datalist id="carrierList">
+                                <option>Misr Life</option>
+                                <option>Orient Takaful</option>
+                                <option>Wethaq Takaful</option>
+                                <option>Royal General</option>
+                                <option>GIG General</option>
+                                <option>Egyptian Takaful</option>
+                                <option>Misr Takaful</option>
+                                <option>Sarwa Life</option>
+                            </datalist>
+                        </div>
+
+                        <!-- Client Info -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-4 mt-2 mb-1">
+                            <h3 class="text-[11px] font-bold text-brand-600 uppercase tracking-wider border-b pb-1" data-i18n="clientDetails">Client Details</h3>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="clientName">Client Name</label>
+                            <input type="text" id="clientName" required class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="clientActivity">Client Activity</label>
+                            <input type="text" id="clientActivity" class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                         <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="branch">Branch</label>
+                             <select id="branch" class="w-full border border-slate-300 rounded px-2 py-1.5 bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                                <option value="HO">HO (Head Office)</option>
+                                <option value="New Cairo Branch">New Cairo Branch</option>
+                                <option value="Heliopolis">Heliopolis</option>
+                                <option value="Alexandria">Alexandria</option>
+                            </select>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-4 mt-2 mb-1">
+                            <h3 class="text-[11px] font-bold text-brand-600 uppercase tracking-wider border-b pb-1" data-i18n="periodProduction">Period & Production</h3>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="startDate">Start Date</label>
+                            <input type="date" id="startDate" required class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="endDate">End Date</label>
+                            <input type="date" id="endDate" required class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                         <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="issueDate">Issue Date</label>
+                            <input type="date" id="issueDate" class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-brand-600 mb-1" data-i18n="prodSource">Production Source</label>
+                            <input type="text" list="prodList" id="production" placeholder="Enter production source" class="w-full border-2 border-brand-100 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                            <datalist id="prodList">
+                                <option>IGIB</option>
+                                <option>Aya - Sales</option>
+                                <option>Broker Care</option>
+                            </datalist>
+                        </div>
+
+                        <!-- Financials -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-4 mt-2 mb-1">
+                            <h3 class="text-[11px] font-bold text-brand-600 uppercase tracking-wider border-b pb-1" data-i18n="financials">Financials (EGP)</h3>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="sumInsured">Sum Insured</label>
+                            <input type="number" step="0.01" id="sumInsured" class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1" data-i18n="totalPremium">Total Premium</label>
+                            <input type="number" step="0.01" id="totalPremium" required class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 bg-emerald-50 border-emerald-200">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="netPremium">Net Premium</label>
+                            <input type="number" step="0.01" id="netPremium" required class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1" data-i18n="netCommission">Net Commission</label>
+                            <input type="number" step="0.01" id="netCommission" class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500 bg-amber-50 border-amber-200">
+                        </div>
+
+                        <!-- Payment Options (NEW) -->
+                        <div class="col-span-1 md:col-span-2 lg:col-span-4 mt-2 mb-1">
+                            <h3 class="text-[11px] font-bold text-brand-600 uppercase tracking-wider border-b pb-1" data-i18n="paymentDetails">Payment Details & Reminders</h3>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="paymentType">Payment Type</label>
+                            <select id="paymentType" onchange="toggleInstallments()" class="w-full border border-slate-300 rounded px-2 py-1.5 bg-white focus:ring-1 focus:ring-brand-500 focus:border-brand-500 text-brand-900 font-medium">
+                                <option value="Full Payment" selected data-i18n="fullPayment">Full Payment</option>
+                                <option value="Installments" data-i18n="installments">Partial / Installments</option>
+                            </select>
+                        </div>
+                        
+                        <div id="installmentContainer" class="hidden col-span-1 md:col-span-2 lg:col-span-3">
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="addInstallmentDates">Add Installment Reminder Dates</label>
+                            <div class="flex gap-2 items-center">
+                                <input type="date" id="newInstallmentDate" class="border border-slate-300 rounded px-2 py-1.5 text-xs w-40">
+                                <button type="button" onclick="addInstallmentDate()" class="bg-brand-500 hover:bg-brand-600 text-white px-3 py-1.5 rounded text-xs font-medium transition flex items-center gap-1">
+                                    <i class="fa-solid fa-plus"></i> <span data-i18n="addDate">Add Date</span>
+                                </button>
+                            </div>
+                            <div id="installmentList" class="mt-2 flex flex-wrap gap-2">
+                                <!-- Badges will appear here -->
+                            </div>
+                        </div>
+
+                         <div class="col-span-1 md:col-span-2 lg:col-span-4">
+                            <label class="block text-xs font-medium text-slate-600 mb-1" data-i18n="notes">Notes</label>
+                            <textarea id="notes" rows="1" class="w-full border border-slate-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-brand-500 focus:border-brand-500" placeholder="..."></textarea>
+                        </div>
+
+                        <div class="col-span-1 md:col-span-2 lg:col-span-4 flex justify-end gap-3 mt-2 border-t border-slate-100 pt-4">
+                             <button type="button" onclick="resetForm()" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-800 transition" data-i18n="clearForm">Clear Form</button>
+                             <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 rounded shadow-md text-sm font-semibold transition transform hover:scale-105 flex items-center gap-2">
+                                <i class="fa-solid fa-save"></i> <span data-i18n="saveEntry">Save Entry</span>
+                             </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Data Table -->
+            <section class="bg-white rounded-lg shadow-sm border border-slate-200 flex-grow flex flex-col overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                    <h2 class="font-bold text-slate-700">
+                        <span data-i18n="recordsFor">Records for</span> 
+                        <span id="currentMonthLabel" class="text-brand-600"></span>
+                    </h2>
+                    <div class="flex items-center gap-3">
+                         <div class="relative">
+                            <i class="fa-solid fa-search absolute left-3 rtl:left-auto rtl:right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" id="searchInput" onkeyup="searchTable()" class="ps-8 pe-3 py-1.5 text-xs border border-slate-300 rounded-full focus:outline-none focus:border-brand-500 w-48 text-start">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto flex-grow custom-scrollbar">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm">
+                        <thead class="bg-slate-100 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="px-3 py-3 text-start font-semibold text-slate-600 border-e w-12" data-i18n="th_hash">#</th>
+                                <th class="px-3 py-3 text-start font-semibold text-slate-600 border-e" data-i18n="th_type">Type</th>
+                                <th class="px-3 py-3 text-start font-semibold text-slate-600 border-e" data-i18n="th_policy">Policy</th>
+                                <th class="px-3 py-3 text-start font-semibold text-slate-600 border-e" data-i18n="th_client">Client</th>
+                                <th class="px-3 py-3 text-start font-semibold text-slate-600 border-e" data-i18n="th_lob">LOB</th>
+                                <th class="px-3 py-3 text-start font-semibold text-slate-600 border-e" data-i18n="th_carrier">Carrier</th>
+                                <th class="px-3 py-3 text-start font-semibold text-slate-600 border-e w-24" data-i18n="th_dates">Dates</th>
+                                <th class="px-3 py-3 text-end font-semibold text-slate-600 border-e bg-emerald-50/50" data-i18n="th_totalPrem">Total Prem.</th>
+                                <th class="px-3 py-3 text-end font-semibold text-slate-600 border-e" data-i18n="th_netComm">Net Comm.</th>
+                                <th class="px-3 py-3 text-center font-semibold text-slate-600 border-e" data-i18n="th_payment">Payment</th>
+                                <th class="px-3 py-3 text-center font-semibold text-slate-600 w-16" data-i18n="th_action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody" class="divide-y divide-slate-200 bg-white">
+                            <!-- Rows added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // --- Translations ---
+        const translations = {
+            en: {
+                appTitle: "Sales Dashboard",
+                edition: "2026 Edition",
+                adminView: "Admin View",
+                guestUser: "Guest User",
+                selectPeriod: "Select Period",
+                salesTarget: "Commission Target",
+                achieved: "Achieved",
+                target: "Target",
+                gap: "Gap",
+                totalPremium: "Total Premium",
+                generatedMonth: "Generated this month",
+                netComm: "Net Comm.",
+                policies: "Policies",
+                topProducers: "Top Producers",
+                noData: "No data yet",
+                exportReport: "Export Report",
+                resetMonth: "Reset Month",
+                newEntry: "New Policy Entry",
+                policyInfo: "Policy Information",
+                businessType: "Business Type",
+                policyNo: "Policy No",
+                endorsementNo: "Endorsement No",
+                lob: "LOB (Line of Business)",
+                carrier: "Current Carrier",
+                clientDetails: "Client Details",
+                clientName: "Client Name",
+                clientActivity: "Client Activity",
+                branch: "Branch",
+                periodProduction: "Period & Production",
+                startDate: "Start Date",
+                endDate: "End Date",
+                issueDate: "Issue Date",
+                prodSource: "Production Source",
+                financials: "Financials (EGP)",
+                sumInsured: "Sum Insured",
+                netPremium: "Net Premium",
+                netCommission: "Net Commission",
+                paymentDetails: "Payment Details & Reminders",
+                paymentType: "Payment Type",
+                addInstallmentDates: "Add Installment Reminder Dates",
+                addDate: "Add Date",
+                notes: "Notes",
+                clearForm: "Clear Form",
+                saveEntry: "Save Entry",
+                recordsFor: "Records for",
+                searchPlaceholder: "Search client...",
+                th_hash: "#",
+                th_type: "Type",
+                th_policy: "Policy",
+                th_client: "Client",
+                th_lob: "LOB",
+                th_carrier: "Carrier",
+                th_dates: "Dates",
+                th_totalPrem: "Total Prem.",
+                th_netComm: "Net Comm.",
+                th_payment: "Payment",
+                th_action: "Action",
+                newBusiness: "New Business",
+                newFromExisting: "New from Existing",
+                renewal: "Renewal",
+                fullPayment: "Full Payment",
+                installments: "Partial / Installments",
+                nextDue: "Next Due",
+                edit: "Edit"
+            },
+            ar: {
+                appTitle: "لوحة متابعة المبيعات",
+                edition: "إصدار 2026",
+                adminView: "واجهة المسؤول",
+                guestUser: "مستخدم زائر",
+                selectPeriod: "اختر الفترة",
+                salesTarget: "هدف العمولة",
+                achieved: "المحقق",
+                target: "المستهدف",
+                gap: "الفارق",
+                totalPremium: "إجمالي الأقساط",
+                generatedMonth: "محقق هذا الشهر",
+                netComm: "صافي العمولة",
+                policies: "الوثائق",
+                topProducers: "أعلى المنتجين",
+                noData: "لا توجد بيانات",
+                exportReport: "تصدير تقرير",
+                resetMonth: "إعادة تعيين الشهر",
+                newEntry: "إضافة وثيقة جديدة",
+                policyInfo: "بيانات الوثيقة",
+                businessType: "نوع العمل",
+                policyNo: "رقم الوثيقة",
+                endorsementNo: "رقم الملحق",
+                lob: "فرع التأمين",
+                carrier: "شركة التأمين",
+                clientDetails: "بيانات العميل",
+                clientName: "اسم العميل",
+                clientActivity: "نشاط العميل",
+                branch: "الفرع",
+                periodProduction: "الفترة والإنتاج",
+                startDate: "تاريخ البداية",
+                endDate: "تاريخ النهاية",
+                issueDate: "تاريخ الإصدار",
+                prodSource: "مصدر الإنتاج",
+                financials: "البيانات المالية (ج.م)",
+                sumInsured: "مبلغ التأمين",
+                netPremium: "صافي القسط",
+                netCommission: "صافي العمولة",
+                paymentDetails: "تفاصيل الدفع والتذكيرات",
+                paymentType: "طريقة الدفع",
+                addInstallmentDates: "إضافة تواريخ تذكير الأقساط",
+                addDate: "إضافة تاريخ",
+                notes: "ملاحظات",
+                clearForm: "مسح النموذج",
+                saveEntry: "حفظ السجل",
+                recordsFor: "سجلات شهر",
+                searchPlaceholder: "بحث عن عميل...",
+                th_hash: "#",
+                th_type: "النوع",
+                th_policy: "الوثيقة",
+                th_client: "العميل",
+                th_lob: "الفرع",
+                th_carrier: "الشركة",
+                th_dates: "التواريخ",
+                th_totalPrem: "إجمالي القسط",
+                th_netComm: "صافي العمولة",
+                th_payment: "الدفع",
+                th_action: "إجراء",
+                newBusiness: "عمل جديد",
+                newFromExisting: "جديد من قائم",
+                renewal: "تجديد",
+                fullPayment: "دفع كامل",
+                installments: "جزئي / أقساط",
+                nextDue: "الاستحقاق القادم",
+                edit: "تعديل"
+            }
+        };
+
+        // --- State Management ---
+        const monthsEn = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+        const monthsAr = [
+            "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", 
+            "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+        ];
+        
+        // UPDATED: Commission targets for 2026 based on your provided data
+        const baseTargets = [
+            962897,   // Jan-26
+            1013769,  // Feb-26
+            787257,   // Mar-26
+            1475011,  // Apr-26
+            1507841,  // May-26
+            1692331,  // Jun-26
+            1611493,  // Jul-26
+            1991758,  // Aug-26
+            2092660,  // Sep-26
+            3042329,  // Oct-26
+            2486069,  // Nov-26
+            3710539   // Dec-26
+        ];
+
+        const currentYear = 2026; 
+        let selectedMonthIndex = new Date().getMonth(); 
+        let currentData = [];
+        let monthlyTarget = 1000000;
+        let currentLang = localStorage.getItem('IGIB_LANG') || 'en';
+        
+        let currentInstallmentDates = [];
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            applyLanguage(currentLang);
+            
+            const today = new Date();
+            // We'll update the date display inside applyLanguage/updateDateDisplay
+            
+            // Initialize User Name
+            initUserName();
+
+            const dateStr = today.toISOString().split('T')[0];
+            document.getElementById('issueDate').value = dateStr;
+            document.getElementById('startDate').value = dateStr;
+            
+            // Set default production source
+            document.getElementById('production').value = 'IGIB';
+            
+            const nextYear = new Date(today);
+            nextYear.setFullYear(today.getFullYear() + 1);
+            nextYear.setDate(today.getDate() - 1);
+            document.getElementById('endDate').value = nextYear.toISOString().split('T')[0];
+        });
+
+        // --- Language Functions ---
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            localStorage.setItem('IGIB_LANG', currentLang);
+            applyLanguage(currentLang);
+        }
+
+        function applyLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            // Update Toggle Button Text
+            document.getElementById('langBtnText').textContent = lang === 'ar' ? 'English' : 'العربية';
+
+            // Update static translations
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            // Update placeholders
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.placeholder = translations[lang].searchPlaceholder;
+            }
+
+            // Update Month Selector
+            initMonthSelector();
+            
+            // Update Date Header
+            updateDateDisplay();
+
+            // Refresh Table & Stats to apply formats
+            loadMonthData(selectedMonthIndex);
+        }
+
+        function updateDateDisplay() {
+            const today = new Date();
+            const locale = currentLang === 'ar' ? 'ar-EG' : 'en-GB';
+            document.getElementById('currentDateDisplay').textContent = today.toLocaleDateString(locale, { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+        }
+
+        // --- Core Functions ---
+
+        function initUserName() {
+            let user = localStorage.getItem('IGIB_USER_NAME');
+            if (!user) {
+                // Simple prompt only on first load, usually simpler to keep in one lang or detect
+                // but let's just stick to default logic
+                user = "Guest User"; 
+            }
+            document.getElementById('userNameDisplay').textContent = user;
+        }
+
+        function changeUserName() {
+            const current = localStorage.getItem('IGIB_USER_NAME') || "";
+            const promptMsg = currentLang === 'ar' ? "أدخل اسم المستخدم:" : "Enter User Name:";
+            const newName = prompt(promptMsg, current);
+            if (newName) {
+                localStorage.setItem('IGIB_USER_NAME', newName);
+                document.getElementById('userNameDisplay').textContent = newName;
+            }
+        }
+
+        function initMonthSelector() {
+            const selector = document.getElementById('monthSelector');
+            const monthNames = currentLang === 'ar' ? monthsAr : monthsEn;
+            
+            selector.innerHTML = '';
+            monthNames.forEach((m, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = `${m} ${currentYear}`;
+                if (index === selectedMonthIndex) opt.selected = true;
+                selector.appendChild(opt);
+            });
+
+            selector.addEventListener('change', (e) => {
+                selectedMonthIndex = parseInt(e.target.value);
+                loadMonthData(selectedMonthIndex);
+            });
+        }
+
+        function getStorageKey(monthIndex) {
+            return `IGIB_DATA_${currentYear}_${monthIndex}`;
+        }
+        
+        function getTargetKey(monthIndex) {
+            return `IGIB_TARGET_${currentYear}_${monthIndex}`;
+        }
+
+        function loadMonthData(monthIndex) {
+            const dataKey = getStorageKey(monthIndex);
+            const storedData = localStorage.getItem(dataKey);
+            currentData = storedData ? JSON.parse(storedData) : [];
+            
+            const targetKey = getTargetKey(monthIndex);
+            const storedTarget = localStorage.getItem(targetKey);
+            monthlyTarget = storedTarget ? parseFloat(storedTarget) : baseTargets[monthIndex];
+
+            const monthNames = currentLang === 'ar' ? monthsAr : monthsEn;
+            document.getElementById('currentMonthLabel').textContent = `${monthNames[monthIndex]} ${currentYear}`;
+            
+            renderTable();
+            updateStats();
+        }
+
+        function saveData() {
+            const key = getStorageKey(selectedMonthIndex);
+            localStorage.setItem(key, JSON.stringify(currentData));
+            updateStats();
+        }
+
+        function editTarget() {
+            const promptMsg = currentLang === 'ar' ? "أدخل هدف العمولة الشهري (ج.م):" : "Enter Monthly Commission Target (EGP):";
+            const newTarget = prompt(promptMsg, monthlyTarget);
+            if (newTarget && !isNaN(newTarget)) {
+                monthlyTarget = parseFloat(newTarget);
+                localStorage.setItem(getTargetKey(selectedMonthIndex), monthlyTarget);
+                updateStats();
+            }
+        }
+        
+        // --- Payment & Installment Logic ---
+        
+        function toggleInstallments() {
+            const type = document.getElementById('paymentType').value;
+            const container = document.getElementById('installmentContainer');
+            if (type === 'Installments') {
+                container.classList.remove('hidden');
+                container.classList.add('fade-in');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+        
+        function addInstallmentDate() {
+            const dateInput = document.getElementById('newInstallmentDate');
+            const dateVal = dateInput.value;
+            if (!dateVal) return;
+            
+            if (!currentInstallmentDates.includes(dateVal)) {
+                currentInstallmentDates.push(dateVal);
+                currentInstallmentDates.sort();
+                renderInstallmentBadges();
+            }
+            dateInput.value = '';
+        }
+        
+        function removeInstallmentDate(dateVal) {
+            currentInstallmentDates = currentInstallmentDates.filter(d => d !== dateVal);
+            renderInstallmentBadges();
+        }
+        
+        function renderInstallmentBadges() {
+            const container = document.getElementById('installmentList');
+            container.innerHTML = '';
+            currentInstallmentDates.forEach(date => {
+                const span = document.createElement('span');
+                span.className = 'bg-blue-50 text-blue-700 border border-blue-200 text-[10px] px-2 py-1 rounded-full flex items-center gap-2';
+                span.innerHTML = `<span dir="ltr">${date}</span> <button type="button" onclick="removeInstallmentDate('${date}')" class="hover:text-red-500 font-bold mx-1">×</button>`;
+                container.appendChild(span);
+            });
+        }
+        
+        function resetForm() {
+            document.getElementById('entryForm').reset();
+            currentInstallmentDates = [];
+            renderInstallmentBadges();
+            toggleInstallments();
+            document.getElementById('businessType').value = "New Business";
+            document.getElementById('production').value = "IGIB";
+        }
+
+        function addEntry() {
+            const pType = document.getElementById('paymentType').value;
+            const instDates = pType === 'Installments' ? [...currentInstallmentDates] : [];
+
+            const entry = {
+                id: Date.now(),
+                serialNo: currentData.length + 1,
+                businessType: document.getElementById('businessType').value,
+                policyNo: document.getElementById('policyNo').value || 'TBA',
+                endorsementNo: document.getElementById('endorsementNo').value || 'TBA',
+                lob: document.getElementById('lob').value,
+                carrier: document.getElementById('carrier').value || 'TBA',
+                clientName: document.getElementById('clientName').value,
+                clientActivity: document.getElementById('clientActivity').value,
+                branch: document.getElementById('branch').value,
+                issueDate: document.getElementById('issueDate').value || 'TBA',
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                production: document.getElementById('production').value || 'IGIB',
+                sumInsured: parseFloat(document.getElementById('sumInsured').value) || 0,
+                totalPremium: parseFloat(document.getElementById('totalPremium').value) || 0,
+                netPremium: parseFloat(document.getElementById('netPremium').value) || 0,
+                netCommission: parseFloat(document.getElementById('netCommission').value) || 0,
+                notes: document.getElementById('notes').value,
+                currency: 'EGP',
+                paymentType: pType,
+                installmentDates: instDates
+            };
+
+            currentData.push(entry);
+            saveData();
+            renderTable();
+            
+            resetForm();
+            document.getElementById('policyNo').focus();
+        }
+
+        function deleteEntry(id) {
+            const confirmMsg = currentLang === 'ar' ? "هل أنت متأكد من حذف هذا السجل؟" : "Delete this record?";
+            if(confirm(confirmMsg)) {
+                currentData = currentData.filter(item => item.id !== id);
+                currentData.forEach((item, index) => item.serialNo = index + 1);
+                saveData();
+                renderTable();
+            }
+        }
+
+        function clearMonthData() {
+            const monthNames = currentLang === 'ar' ? monthsAr : monthsEn;
+            const msg = currentLang === 'ar' 
+                ? `هل أنت متأكد من إعادة تعيين جميع البيانات لشهر ${monthNames[selectedMonthIndex]}؟` 
+                : `Reset ALL data for ${monthNames[selectedMonthIndex]}?`;
+                
+            if(confirm(msg)) {
+                currentData = currentData.filter(item => false); // Clears array safely
+                saveData();
+                renderTable();
+            }
+        }
+
+        // --- Rendering ---
+
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            let displayData = currentData;
+            if (searchVal) {
+                displayData = currentData.filter(item => 
+                    item.clientName.toLowerCase().includes(searchVal) || 
+                    item.policyNo.toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (displayData.length === 0) {
+                const noRecMsg = currentLang === 'ar' ? "لا توجد سجلات." : "No records found.";
+                tbody.innerHTML = `
+                    <tr class="text-center text-slate-500">
+                        <td colspan="11" class="py-8 bg-slate-50/50">
+                            <i class="fa-solid fa-inbox text-2xl text-slate-300 mb-2"></i>
+                            <p class="text-xs">${noRecMsg}</p>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            displayData.sort((a, b) => a.serialNo - b.serialNo);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            const warningDate = new Date();
+            warningDate.setDate(today.getDate() + 7);
+
+            displayData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-brand-50 transition group border-b border-slate-100 last:border-0";
+                
+                // Determine badge styling based on business type
+                let typeClass, typeLabel;
+                if (row.businessType === 'New Business') {
+                    typeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                    typeLabel = translations[currentLang].newBusiness;
+                } else if (row.businessType === 'New from Existing') {
+                    typeClass = 'bg-orange-100 text-orange-800 border-orange-200';
+                    typeLabel = translations[currentLang].newFromExisting;
+                } else { // Renewal
+                    typeClass = 'bg-blue-100 text-blue-800 border-blue-200';
+                    typeLabel = translations[currentLang].renewal;
+                }
+
+                // Payment Status Logic
+                let paymentStatusHtml = '';
+                if (row.paymentType === 'Full Payment') {
+                    paymentStatusHtml = `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-[10px] font-bold border border-green-200">${translations[currentLang].fullPayment}</span>`;
+                } else {
+                    const dates = row.installmentDates || [];
+                    const nextDateStr = dates.find(d => new Date(d) >= today) || dates[dates.length - 1]; 
+                    
+                    if (!nextDateStr) {
+                         paymentStatusHtml = `<span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-[10px] font-bold border border-slate-200">${translations[currentLang].installments}</span>`;
+                    } else {
+                        const nextDate = new Date(nextDateStr);
+                        let badgeClass = "bg-blue-50 text-blue-600 border-blue-200"; 
+                        
+                        if (nextDate < today) {
+                             badgeClass = "bg-red-100 text-red-600 border-red-200 font-bold";
+                        } else if (nextDate <= warningDate) {
+                             badgeClass = "bg-orange-100 text-orange-700 border-orange-200 font-bold";
+                        }
+                        
+                        paymentStatusHtml = `
+                            <div class="flex flex-col items-center">
+                                <span class="text-[9px] text-slate-400 uppercase">${translations[currentLang].nextDue}</span>
+                                <span class="${badgeClass} px-2 py-0.5 rounded text-[10px] border whitespace-nowrap" dir="ltr">${nextDateStr}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                tr.innerHTML = `
+                    <td class="px-3 py-3 border-e font-medium text-slate-500 text-xs text-start">${row.serialNo}</td>
+                    <td class="px-3 py-3 border-e text-center">
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold border ${typeClass} whitespace-nowrap">
+                            ${typeLabel}
+                        </span>
+                    </td>
+                    <td class="px-3 py-3 border-e text-start">
+                        <div class="font-bold text-slate-700 text-xs">${row.policyNo}</div>
+                        ${row.endorsementNo ? `<div class="text-[10px] text-slate-400">End: ${row.endorsementNo}</div>` : ''}
+                    </td>
+                    <td class="px-3 py-3 border-e text-start">
+                        <div class="text-slate-800 font-medium text-xs">${row.clientName}</div>
+                        <div class="text-[10px] text-slate-500 truncate max-w-[120px]">${row.clientActivity || ''}</div>
+                    </td>
+                    <td class="px-3 py-3 border-e text-slate-700 text-xs text-start">
+                        <span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold border border-slate-200">${row.lob}</span>
+                    </td>
+                    <td class="px-3 py-3 border-e text-slate-600 text-[11px] text-start">${row.carrier}</td>
+                    <td class="px-3 py-3 border-e text-slate-500 text-[10px] whitespace-nowrap text-start" dir="ltr">
+                        <div class="flex gap-1 justify-end rtl:justify-start"><span class="text-emerald-600 font-bold">S:</span> ${row.startDate}</div>
+                        <div class="flex gap-1 justify-end rtl:justify-start"><span class="text-red-400 font-bold">E:</span> ${row.endDate}</div>
+                    </td>
+                    <td class="px-3 py-3 border-e text-end font-bold text-emerald-700 text-xs bg-emerald-50/30">${formatCurrency(row.totalPremium)}</td>
+                    <td class="px-3 py-3 border-e text-end font-medium text-amber-700 text-xs">${formatCurrency(row.netCommission)}</td>
+                    <td class="px-3 py-3 border-e text-center">${paymentStatusHtml}</td>
+                    <td class="px-3 py-3 text-center">
+                        <button onclick="deleteEntry(${row.id})" class="text-slate-300 hover:text-red-500 transition px-2">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStats() {
+            // 1. Basic Totals
+            const totalPrem = currentData.reduce((sum, item) => sum + (item.totalPremium || 0), 0);
+            const totalComm = currentData.reduce((sum, item) => sum + (item.netCommission || 0), 0);
+            
+            document.getElementById('statCount').textContent = currentData.length;
+            document.getElementById('statPremium').textContent = formatCurrency(totalPrem);
+            document.getElementById('statCommission').textContent = formatCurrency(totalComm);
+
+            // 2. Target Progress - UPDATED TO USE COMMISSION
+            const pct = Math.min((totalComm / monthlyTarget) * 100, 100);
+            const gap = monthlyTarget - totalComm;
+            
+            document.getElementById('targetDisplay').textContent = formatCurrency(monthlyTarget);
+            document.getElementById('targetPercentage').textContent = pct.toFixed(1) + "%";
+            
+            const gapLabel = currentLang === 'ar' ? "تحقق!" : "Hit!";
+            document.getElementById('targetGap').textContent = gap > 0 ? formatCurrency(gap) : gapLabel;
+            document.getElementById('targetGap').className = gap > 0 ? "font-bold text-red-500" : "font-bold text-green-500";
+            
+            const bar = document.getElementById('targetProgressBar');
+            bar.style.width = pct + "%";
+            if(pct < 30) bar.className = "h-3 rounded-full transition-all duration-1000 progress-bar-striped bg-red-500";
+            else if(pct < 70) bar.className = "h-3 rounded-full transition-all duration-1000 progress-bar-striped bg-amber-500";
+            else bar.className = "h-3 rounded-full transition-all duration-1000 progress-bar-striped bg-green-500";
+
+            // 3. Top Producers Breakdown
+            const producerMap = {};
+            currentData.forEach(row => {
+                const src = row.production || 'Unknown';
+                if(!producerMap[src]) producerMap[src] = 0;
+                producerMap[src] += (parseFloat(row.totalPremium) || 0);
+            });
+
+            const sortedProducers = Object.entries(producerMap).sort(([,a], [,b]) => b - a);
+            const listContainer = document.getElementById('producersList');
+            listContainer.innerHTML = '';
+
+            if (sortedProducers.length === 0) {
+                 listContainer.innerHTML = `<div class="text-xs text-slate-400 text-center py-2">${translations[currentLang].noData}</div>`;
+            } else {
+                sortedProducers.forEach(([name, val], idx) => {
+                    const widthPct = (val / totalPrem) * 100;
+                    const item = document.createElement('div');
+                    item.className = "text-xs";
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-semibold text-slate-700">${idx+1}. ${name}</span>
+                            <span class="text-slate-500">${formatCurrency(val)}</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden" dir="ltr">
+                            <div class="bg-brand-400 h-1.5 rounded-full" style="width: ${widthPct}%"></div>
+                        </div>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            }
+        }
+
+        function formatCurrency(num) {
+            const locale = currentLang === 'ar' ? 'ar-EG' : 'en-EG';
+            return new Intl.NumberFormat(locale, { style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
+        }
+
+        function toggleForm() {
+            const container = document.getElementById('inputFormContainer');
+            const icon = document.getElementById('formIcon');
+            container.classList.toggle('hidden');
+            if(container.classList.contains('hidden')) {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+        
+        function searchTable() {
+            renderTable();
+        }
+
+        function exportToCSV() {
+            if(currentData.length === 0) {
+                alert(currentLang === 'ar' ? "لا توجد بيانات للتصدير." : "No data to export.");
+                return;
+            }
+
+            const headers = [
+                "Serial No", "Business Type", "Policy No", "Endorsement No", "LOB", "Current Carrier", 
+                "Client Name", "Client Activity", "Issue Date", "Start Date", "End Date", 
+                "Currency", "Branch", "Sum Insured", "Total Premium", "Net Premium", 
+                "Net Commission", "Payment Type", "Installment Dates", "Notes", "Production"
+            ];
+
+            const csvRows = [];
+            csvRows.push(headers.join(','));
+
+            currentData.forEach(row => {
+                const values = [
+                    row.serialNo,
+                    `"${row.businessType || 'New Business'}"`,
+                    `"${row.policyNo}"`, 
+                    `"${row.endorsementNo || ''}"`,
+                    `"${row.lob}"`,
+                    `"${row.carrier}"`,
+                    `"${row.clientName}"`,
+                    `"${row.clientActivity || ''}"`,
+                    row.issueDate,
+                    row.startDate,
+                    row.endDate,
+                    row.currency,
+                    row.branch,
+                    row.sumInsured,
+                    row.totalPremium,
+                    row.netPremium,
+                    row.netCommission,
+                    `"${row.paymentType || 'Full Payment'}"`,
+                    `"${(row.installmentDates || []).join('; ')}"`,
+                    `"${(row.notes || '').replace(/"/g, '""')}"`,
+                    `"${row.production}"`
+                ];
+                csvRows.push(values.join(','));
+            });
+
+            const csvString = csvRows.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            const monthNames = currentLang === 'ar' ? monthsAr : monthsEn;
+            a.setAttribute('download', `IGIB_Sales_Report_${monthNames[selectedMonthIndex]}_${currentYear}.csv`);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+    </script>
+</body>
+</html>

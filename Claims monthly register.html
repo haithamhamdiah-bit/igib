@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGIB Claims Management Dashboard 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#003781', // IGIB Dark Blue
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans Arabic', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        [dir="rtl"] .ml-auto { margin-right: auto; margin-left: 0; }
+        [dir="ltr"] .mr-auto { margin-left: auto; margin-right: 0; }
+
+        .modal-enter {
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="transition-all duration-300">
+
+    <!-- Navigation -->
+    <nav class="bg-brand-900 text-white px-4 md:px-8 py-4 flex justify-between items-center shadow-xl sticky top-0 z-40">
+        <div class="flex items-center gap-4">
+            <div class="bg-white p-2 rounded-xl shadow-inner">
+                <i class="fas fa-file-invoice-dollar text-brand-900 text-xl"></i>
+            </div>
+            <div>
+                <h1 id="nav-title" class="text-lg md:text-xl font-bold tracking-tight">نظام إدارة المطالبات</h1>
+                <p id="nav-subtitle" class="text-[10px] text-blue-200 uppercase tracking-widest font-semibold">Claims Management System</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2 md:gap-4">
+            <button onclick="toggleLanguage()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-all text-sm border border-white/20">
+                <i class="fas fa-globe"></i>
+                <span id="lang-btn-text">English</span>
+            </button>
+            <button onclick="exportToExcel()" class="hidden md:flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg border-b-4 border-emerald-700 active:border-b-0 active:translate-y-1">
+                <i class="fas fa-file-excel"></i>
+                <span id="export-btn-text">تصدير Excel</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+        
+        <!-- Statistics Dashboard -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border-r-4 border-blue-500 hover:shadow-md transition-all">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p id="stat-total-label" class="text-slate-500 text-sm font-semibold">إجمالي المطالبات</p>
+                        <h3 id="stat-total-count" class="text-3xl font-black text-slate-800 mt-1">0</h3>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-lg"><i class="fas fa-copy text-blue-500"></i></div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border-r-4 border-emerald-500 hover:shadow-md transition-all">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p id="stat-paid-label" class="text-slate-500 text-sm font-semibold">المبالغ المسددة</p>
+                        <h3 id="stat-paid-val" class="text-2xl font-black text-slate-800 mt-1">0 <span class="text-xs font-normal">EGP</span></h3>
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-lg"><i class="fas fa-check-double text-emerald-500"></i></div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border-r-4 border-amber-500 hover:shadow-md transition-all">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p id="stat-pending-label" class="text-slate-500 text-sm font-semibold">تحت التسوية</p>
+                        <h3 id="stat-pending-val" class="text-2xl font-black text-slate-800 mt-1">0 <span class="text-xs font-normal">EGP</span></h3>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-lg"><i class="fas fa-clock text-amber-500"></i></div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border-r-4 border-purple-500 hover:shadow-md transition-all">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p id="stat-ratio-label" class="text-slate-500 text-sm font-semibold">نسبة التسوية</p>
+                        <h3 id="stat-ratio-val" class="text-3xl font-black text-slate-800 mt-1">0%</h3>
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded-lg"><i class="fas fa-chart-line text-purple-500"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="flex flex-col lg:flex-row gap-4 justify-between items-center bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                <div class="relative flex-1 min-w-[280px]">
+                    <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="searchInput" oninput="renderTable()" placeholder="البحث عن اسم العميل..." class="w-full pr-11 pl-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-brand-500 outline-none transition-all">
+                </div>
+                <select id="filterCarrier" onchange="renderTable()" class="py-3 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:ring-2 focus:ring-brand-500">
+                    <option value="all">كل الشركات</option>
+                </select>
+                <select id="filterStatus" onchange="renderTable()" class="py-3 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:ring-2 focus:ring-brand-500">
+                    <option value="all">كل الحالات</option>
+                    <option value="Settled">مسدد</option>
+                    <option value="Pending">تحت التسوية</option>
+                </select>
+            </div>
+
+            <button onclick="openModal()" class="w-full lg:w-auto flex items-center justify-center gap-3 bg-brand-900 hover:bg-blue-800 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+                <i class="fas fa-plus-circle"></i>
+                <span id="add-btn-text">إضافة مطالبة جديدة</span>
+            </button>
+        </div>
+
+        <!-- Table Container -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-sm text-right">
+                    <thead class="bg-slate-50 text-slate-600 border-b border-slate-100">
+                        <tr>
+                            <th class="px-6 py-5 font-bold" id="th-client">اسم العميل</th>
+                            <th class="px-6 py-5 font-bold text-center" id="th-carrier">شركة التأمين</th>
+                            <th class="px-6 py-5 font-bold text-center" id="th-policy">رقم الوثيقة</th>
+                            <th class="px-6 py-5 font-bold text-center" id="th-chassis">رقم الشاسيه</th>
+                            <th class="px-6 py-5 font-bold text-center" id="th-value">القيمة</th>
+                            <th class="px-6 py-5 font-bold text-center" id="th-status">الحالة</th>
+                            <th class="px-6 py-5 font-bold text-center" id="th-date">تاريخ المطالبة</th>
+                            <th class="px-6 py-5 font-bold text-center" id="th-actions">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-50">
+                        <!-- Dynamic Content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Form -->
+    <div id="modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden modal-enter flex flex-col">
+            <div class="p-6 border-b flex justify-between items-center bg-brand-900 text-white">
+                <h2 id="modalTitle" class="text-xl font-bold">إضافة مطالبة جديدة</h2>
+                <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="claimForm" class="p-8 space-y-6 overflow-y-auto">
+                <input type="hidden" id="editIndex" value="">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-slate-700 mb-2" id="lbl-client">اسم العميل</label>
+                        <input type="text" id="clientName" required class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" id="lbl-carrier">شركة التأمين</label>
+                        <div id="carrierContainer">
+                            <select id="carrier" onchange="checkNewCarrier(this.value)" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none bg-white">
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div id="newCarrierDiv" class="hidden mt-2 flex gap-2">
+                            <input type="text" id="newCarrierInput" placeholder="اسم الشركة الجديدة" class="flex-1 px-4 py-3 rounded-xl border-2 border-brand-500 outline-none">
+                            <button type="button" onclick="cancelNewCarrier()" class="p-3 text-red-500 hover:bg-red-50 rounded-xl"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" id="lbl-policy">رقم الوثيقة</label>
+                        <input type="text" id="policyNo" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" id="lbl-chassis">رقم الشاسيه</label>
+                        <input type="text" id="chassisNo" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" id="lbl-value">قيمة المطالبة</label>
+                        <input type="number" id="claimValue" required class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-brand-500 font-bold text-brand-900">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" id="lbl-paid">المبلغ المسدد</label>
+                        <input type="number" id="paidAmount" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:border-brand-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" id="lbl-status">الحالة</label>
+                        <select id="status" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none bg-white">
+                            <option value="Pending">تحت التسوية</option>
+                            <option value="Settled">مسدد</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2" id="lbl-date">تاريخ المطالبة</label>
+                        <input type="date" id="claimDate" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none">
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t flex gap-4">
+                    <button type="submit" class="flex-1 bg-brand-900 hover:bg-blue-800 text-white py-4 rounded-2xl font-black text-lg shadow-xl transition-all">
+                        <span id="save-btn-text">حفظ البيانات</span>
+                    </button>
+                    <button type="button" onclick="closeModal()" class="px-8 py-4 border-2 border-slate-200 rounded-2xl font-bold text-slate-500 hover:bg-slate-50 transition-all">
+                        <span id="cancel-btn-text">إلغاء</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration & State ---
+        let currentLang = 'ar';
+        
+        // Data populated from uploaded CSV snippets
+        let records = JSON.parse(localStorage.getItem('igib_claims_v1')) || [
+            { id: 1, clientName: "حسن محمود محمد", policyNo: "28855", chassisNo: "CH-12345", carrier: "وطنيه للتامين", claimDate: "2025-08-27", claimValue: 600000, paidAmount: 600000, status: "Settled" },
+            { id: 2, clientName: "الابنيه التعليميه", policyNo: "81641", chassisNo: "CH-99887", carrier: "المصريه للتامين التكافلى", claimDate: "2025-12-11", claimValue: 50000, paidAmount: 0, status: "Pending" }
+        ];
+
+        const translations = {
+            ar: {
+                navTitle: "نظام إدارة المطالبات",
+                totalLabel: "إجمالي المطالبات",
+                paidLabel: "المبالغ المسددة",
+                pendingLabel: "مبالغ تحت التسوية",
+                ratioLabel: "نسبة التسوية",
+                search: "البحث عن اسم العميل...",
+                allCos: "كل الشركات",
+                allStats: "كل الحالات",
+                addBtn: "إضافة مطالبة جديدة",
+                thClient: "اسم العميل",
+                thCarrier: "شركة التأمين",
+                thPolicy: "رقم الوثيقة",
+                thChassis: "رقم الشاسيه",
+                thValue: "القيمة",
+                thStatus: "الحالة",
+                thDate: "التاريخ",
+                thActions: "الإجراءات",
+                settled: "مسدد",
+                pending: "تحت التسوية",
+                other: "+ إضافة شركة جديدة",
+                save: "حفظ البيانات",
+                cancel: "إلغاء",
+                export: "تصدير Excel",
+                delConfirm: "هل أنت متأكد من الحذف؟",
+                selectCo: "اختر الشركة",
+                newCoPlaceholder: "اسم الشركة الجديدة"
+            },
+            en: {
+                navTitle: "Claims Management System",
+                totalLabel: "Total Claims",
+                paidLabel: "Settled Amount",
+                pendingLabel: "Pending Amount",
+                ratioLabel: "Settlement Ratio",
+                search: "Search client name...",
+                allCos: "All Companies",
+                allStats: "All Statuses",
+                addBtn: "Add New Claim",
+                thClient: "Client Name",
+                thCarrier: "Insurance Co",
+                thPolicy: "Policy No",
+                thChassis: "Chassis No",
+                thValue: "Value",
+                thStatus: "Status",
+                thDate: "Date",
+                thActions: "Actions",
+                settled: "Settled",
+                pending: "Pending",
+                other: "+ Add New Company",
+                save: "Save Record",
+                cancel: "Cancel",
+                export: "Export Excel",
+                delConfirm: "Are you sure you want to delete this?",
+                selectCo: "Select Company",
+                newCoPlaceholder: "New Company Name"
+            }
+        };
+
+        // --- Core Logic ---
+
+        function init() {
+            updateLangUI();
+            updateCarriersDropdown();
+            renderTable();
+            updateStats();
+        }
+
+        function updateLangUI() {
+            const t = translations[currentLang];
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.getElementById('nav-title').textContent = t.navTitle;
+            document.getElementById('stat-total-label').textContent = t.totalLabel;
+            document.getElementById('stat-paid-label').textContent = t.paidLabel;
+            document.getElementById('stat-pending-label').textContent = t.pendingLabel;
+            document.getElementById('stat-ratio-label').textContent = t.ratioLabel;
+            document.getElementById('searchInput').placeholder = t.search;
+            document.getElementById('add-btn-text').textContent = t.addBtn;
+            document.getElementById('export-btn-text').textContent = t.export;
+            document.getElementById('lang-btn-text').textContent = currentLang === 'ar' ? 'English' : 'العربية';
+            
+            // Labels
+            document.getElementById('lbl-client').textContent = t.thClient;
+            document.getElementById('lbl-carrier').textContent = t.thCarrier;
+            document.getElementById('lbl-policy').textContent = t.thPolicy;
+            document.getElementById('lbl-chassis').textContent = t.thChassis;
+            document.getElementById('lbl-value').textContent = t.thValue;
+            document.getElementById('lbl-paid').textContent = t.paidLabel;
+            document.getElementById('lbl-status').textContent = t.thStatus;
+            document.getElementById('lbl-date').textContent = t.thDate;
+            document.getElementById('save-btn-text').textContent = t.save;
+            document.getElementById('cancel-btn-text').textContent = t.cancel;
+
+            // Table Headers
+            document.getElementById('th-client').textContent = t.thClient;
+            document.getElementById('th-carrier').textContent = t.thCarrier;
+            document.getElementById('th-policy').textContent = t.thPolicy;
+            document.getElementById('th-chassis').textContent = t.thChassis;
+            document.getElementById('th-value').textContent = t.thValue;
+            document.getElementById('th-status').textContent = t.thStatus;
+            document.getElementById('th-date').textContent = t.thDate;
+            document.getElementById('th-actions').textContent = t.thActions;
+
+            // Filter Dropdowns
+            const fCarrier = document.getElementById('filterCarrier');
+            const fStatus = document.getElementById('filterStatus');
+            fCarrier.options[0].text = t.allCos;
+            fStatus.options[0].text = t.allStats;
+            fStatus.options[1].text = t.settled;
+            fStatus.options[2].text = t.pending;
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            updateLangUI();
+            renderTable();
+            updateCarriersDropdown();
+        }
+
+        function updateCarriersDropdown() {
+            const select = document.getElementById('carrier');
+            const filter = document.getElementById('filterCarrier');
+            const t = translations[currentLang];
+            
+            const uniqueCarriers = [...new Set(records.map(r => r.carrier))].sort();
+            
+            // Modal Dropdown
+            let html = `<option value="">${t.selectCo}</option>`;
+            uniqueCarriers.forEach(c => html += `<option value="${c}">${c}</option>`);
+            html += `<option value="ADD_NEW" style="color:blue; font-weight:bold;">${t.other}</option>`;
+            select.innerHTML = html;
+
+            // Filter Dropdown
+            let filterHtml = `<option value="all">${t.allCos}</option>`;
+            uniqueCarriers.forEach(c => filterHtml += `<option value="${c}">${c}</option>`);
+            filter.innerHTML = filterHtml;
+        }
+
+        function renderTable() {
+            const body = document.getElementById('tableBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const fCarrier = document.getElementById('filterCarrier').value;
+            const fStatus = document.getElementById('filterStatus').value;
+            const t = translations[currentLang];
+
+            const filtered = records.filter(r => {
+                const matchSearch = r.clientName.toLowerCase().includes(search);
+                const matchCarrier = fCarrier === 'all' || r.carrier === fCarrier;
+                const matchStatus = fStatus === 'all' || r.status === fStatus;
+                return matchSearch && matchCarrier && matchStatus;
+            });
+
+            body.innerHTML = filtered.length ? filtered.map((r, i) => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 font-semibold text-slate-800">${r.clientName}</td>
+                    <td class="px-6 py-4 text-center text-slate-500">${r.carrier}</td>
+                    <td class="px-6 py-4 text-center"><span class="bg-slate-100 px-2 py-1 rounded font-mono text-xs">${r.policyNo}</span></td>
+                    <td class="px-6 py-4 text-center"><span class="text-xs text-slate-400 font-mono">${r.chassisNo || '-'}</span></td>
+                    <td class="px-6 py-4 text-center font-bold text-slate-700">${Number(r.claimValue).toLocaleString()}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-[11px] font-bold ${r.status === 'Settled' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                            ${r.status === 'Settled' ? t.settled : t.pending}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center text-slate-500">${r.claimDate}</td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="editRecord(${records.indexOf(r)})" class="w-8 h-8 rounded-lg text-blue-600 hover:bg-blue-50 transition-all"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteRecord(${records.indexOf(r)})" class="w-8 h-8 rounded-lg text-red-600 hover:bg-red-50 transition-all"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td colspan="8" class="py-20 text-center text-slate-400 italic">No records found</td></tr>`;
+        }
+
+        function updateStats() {
+            const totalCount = records.length;
+            const totalValue = records.reduce((s, r) => s + (Number(r.claimValue) || 0), 0);
+            const totalPaid = records.reduce((s, r) => s + (Number(r.paidAmount) || 0), 0);
+            const ratio = totalValue > 0 ? ((totalPaid / totalValue) * 100).toFixed(1) : 0;
+
+            document.getElementById('stat-total-count').textContent = totalCount;
+            document.getElementById('stat-paid-val').innerHTML = `${totalPaid.toLocaleString()} <span class="text-xs font-normal">EGP</span>`;
+            document.getElementById('stat-pending-val').innerHTML = `${(totalValue - totalPaid).toLocaleString()} <span class="text-xs font-normal">EGP</span>`;
+            document.getElementById('stat-ratio-val').textContent = `${ratio}%`;
+        }
+
+        // --- CRUD Ops ---
+
+        function openModal() {
+            document.getElementById('claimForm').reset();
+            document.getElementById('editIndex').value = "";
+            document.getElementById('claimDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modalTitle').textContent = translations[currentLang].addBtn;
+            document.getElementById('modal').classList.remove('hidden');
+            cancelNewCarrier();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function checkNewCarrier(val) {
+            if (val === 'ADD_NEW') {
+                document.getElementById('carrierContainer').classList.add('hidden');
+                document.getElementById('newCarrierDiv').classList.remove('hidden');
+                document.getElementById('newCarrierInput').focus();
+            }
+        }
+
+        function cancelNewCarrier() {
+            document.getElementById('carrierContainer').classList.remove('hidden');
+            document.getElementById('newCarrierDiv').classList.add('hidden');
+            document.getElementById('newCarrierInput').value = "";
+            document.getElementById('carrier').value = "";
+        }
+
+        document.getElementById('claimForm').onsubmit = function(e) {
+            e.preventDefault();
+            const editIdx = document.getElementById('editIndex').value;
+            
+            let carrierValue = document.getElementById('carrier').value;
+            const newCarrier = document.getElementById('newCarrierInput').value;
+            if (newCarrier) carrierValue = newCarrier;
+
+            const record = {
+                id: editIdx !== "" ? records[editIdx].id : Date.now(),
+                clientName: document.getElementById('clientName').value,
+                carrier: carrierValue,
+                policyNo: document.getElementById('policyNo').value,
+                chassisNo: document.getElementById('chassisNo').value,
+                claimValue: parseFloat(document.getElementById('claimValue').value),
+                paidAmount: parseFloat(document.getElementById('paidAmount').value || 0),
+                status: document.getElementById('status').value,
+                claimDate: document.getElementById('claimDate').value
+            };
+
+            if (editIdx !== "") {
+                records[editIdx] = record;
+            } else {
+                records.push(record);
+            }
+
+            localStorage.setItem('igib_claims_v1', JSON.stringify(records));
+            closeModal();
+            updateCarriersDropdown();
+            renderTable();
+            updateStats();
+        };
+
+        function editRecord(idx) {
+            const r = records[idx];
+            openModal();
+            document.getElementById('editIndex').value = idx;
+            document.getElementById('modalTitle').textContent = translations[currentLang].thActions;
+            
+            document.getElementById('clientName').value = r.clientName;
+            document.getElementById('carrier').value = r.carrier;
+            document.getElementById('policyNo').value = r.policyNo;
+            document.getElementById('chassisNo').value = r.chassisNo || '';
+            document.getElementById('claimValue').value = r.claimValue;
+            document.getElementById('paidAmount').value = r.paidAmount;
+            document.getElementById('status').value = r.status;
+            document.getElementById('claimDate').value = r.claimDate;
+        }
+
+        function deleteRecord(idx) {
+            if (confirm(translations[currentLang].delConfirm)) {
+                records.splice(idx, 1);
+                localStorage.setItem('igib_claims_v1', JSON.stringify(records));
+                renderTable();
+                updateStats();
+                updateCarriersDropdown();
+            }
+        }
+
+        function exportToExcel() {
+            const t = translations[currentLang];
+            
+            // Format data for Excel with translated headers
+            const excelData = records.map(r => ({
+                [t.thClient]: r.clientName,
+                [t.thCarrier]: r.carrier,
+                [t.thPolicy]: r.policyNo,
+                [t.thChassis]: r.chassisNo || '',
+                [t.thValue]: r.claimValue,
+                [t.paidLabel]: r.paidAmount,
+                [t.thStatus]: r.status === 'Settled' ? t.settled : t.pending,
+                [t.thDate]: r.claimDate
+            }));
+
+            // Create Worksheet
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            
+            // Set RTL for Arabic or LTR for English in the sheet if supported
+            if (currentLang === 'ar') worksheet['!dir'] = 'rtl';
+
+            // Create Workbook
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Claims Register");
+
+            // Write File
+            const fileName = `IGIB_Claims_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+        }
+
+        // Init App
+        window.onload = init;
+    </script>
+</body>
+</html>
